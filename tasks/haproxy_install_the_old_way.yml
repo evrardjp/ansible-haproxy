@@ -13,3 +13,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+- name: Installs haproxy packages by yum
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items: haproxy_packagenames
+  when: ansible_os_family == 'RedHat'
+
+- name: Installs haproxy packages by apt
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items: haproxy_packagenames
+  when: ansible_os_family == 'Debian'
+
+- name: Installs haproxy packages by pkgin
+  pkgin:
+    name: "{{ item }}"
+    state: present
+  with_items: haproxy_packagenames
+  when: ansible_os_family == 'Solaris'

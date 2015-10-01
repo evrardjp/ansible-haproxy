@@ -13,3 +13,37 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+- include: haproxy_install_the_new_way.yml
+  when: (ansible_version.major | version_compare ('2','>'))
+
+- include: haproxy_install_the_old_way.yml
+  when: (ansible_version.major | version_compare ('2','<'))
+
+#TODO: Need to work on this for debian/centos
+- name: Replace haproxy defaults
+  template:
+    src: default_haproxy.j2
+    dest: /etc/default/haproxy
+  when: ansible_distribution == 'Ubuntu'
+
+#TODO: Need to work on this for debian/centos
+- name: Replace haproxy init script to allow conf.d
+  copy:
+    src: haproxy.sh
+    dest: /etc/init.d/haproxy
+    mode: "0755"
+  when: >
+    ansible_distribution == 'Ubuntu' and
+    haproxy_use_extra_config_folder | bool
+
+- name: Create the extra configuration folder
+  file:
+    path: "{{ haproxy_extra_config_folder_path }}"
+    state: directory
+    recurse: yes
+  when: haproxy_use_extra_config_folder | bool
+
+- name: Enable the service
+  service:
+    name: "{{ haproxy_service_name }}"
+    enabled: yes

@@ -13,3 +13,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+- name: Make haproxy bindable on non local addresses
+  sysctl:
+    name: net.ipv4.ip_nonlocal_bind
+    value: 1
+    sysctl_set: yes
+    state: present
+  when: haproxy_bind_on_non_local | bool
+
+- name: Drop base haproxy config
+  template:
+    src: haproxy.cfg.j2
+    dest: "{{ haproxy_server_configuration_folder }}/haproxy.cfg"
+  notify: Restart haproxy
+
+- name: Generate files for the frontends and backends
+  template:
+    src: service.j2
+    dest: "/etc/haproxy/conf.d/{{ item.name }}"
+  with_items: haproxy_services
+  when: haproxy_use_extra_config_folder | bool
+  notify: Restart haproxy

@@ -13,13 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-- name: regen pem
-  shell: >
-    cat {{ haproxy_ssl_cert }} {{ haproxy_user_ssl_ca_cert is defined | ternary(haproxy_ssl_ca_cert,'') }} {{ haproxy_ssl_key }} > {{ haproxy_ssl_pem }}
-  notify: Restart haproxy
-
-- name: Restart haproxy
-  service:
-    name: "{{ haproxy_service_name }}"
-    state: "restarted"
-    pattern: "haproxy"
+haproxy_server_configuration_folder: "/etc/haproxy"
+haproxy_extra_config_folder_path: "{{ haproxy_server_configuration_folder }}/conf.d"
+haproxy_server_repo: "deb http://httpredir.debian.org/debian {{ ansible_distribution_release }}-backports main"
+haproxy_service_name: haproxy

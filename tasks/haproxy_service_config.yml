@@ -1,5 +1,5 @@
 ---
-# Copyright 2015, Jean-Philippe Evrard <jean-philippe@evrard.me>
+# Copyright 2015, Jean-Philippe Evrard <jean-philippe.evrard@belnet.be>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,14 +12,3 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-- name: regen pem
-  shell: >
-    cat {{ haproxy_ssl_cert }} {{ haproxy_user_ssl_ca_cert is defined | ternary(haproxy_ssl_ca_cert,'') }} {{ haproxy_ssl_key }} > {{ haproxy_ssl_pem }}
-  notify: Restart haproxy
-
-- name: Restart haproxy
-  service:
-    name: "{{ haproxy_service_name }}"
-    state: "restarted"
-    pattern: "haproxy"

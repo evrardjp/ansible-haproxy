@@ -13,13 +13,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-- name: regen pem
-  shell: >
-    cat {{ haproxy_ssl_cert }} {{ haproxy_user_ssl_ca_cert is defined | ternary(haproxy_ssl_ca_cert,'') }} {{ haproxy_ssl_key }} > {{ haproxy_ssl_pem }}
-  notify: Restart haproxy
+- name: Check epel repo
+  shell: yum repolist | grep -qi EPEL
+  register: epel_repo_present
 
-- name: Restart haproxy
-  service:
-    name: "{{ haproxy_service_name }}"
-    state: "restarted"
-    pattern: "haproxy"
+- name: Add epel repo
+  template:
+    src: epel.repo
+    dest: /etc/yum.repos.d/epel.repo
+    owner: root
+    group: root
+    mode: "0644"
+  when: epel_repo_present.rc != 0

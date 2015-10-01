@@ -13,13 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-- name: regen pem
-  shell: >
-    cat {{ haproxy_ssl_cert }} {{ haproxy_user_ssl_ca_cert is defined | ternary(haproxy_ssl_ca_cert,'') }} {{ haproxy_ssl_key }} > {{ haproxy_ssl_pem }}
-  notify: Restart haproxy
-
-- name: Restart haproxy
-  service:
-    name: "{{ haproxy_service_name }}"
-    state: "restarted"
-    pattern: "haproxy"
+# Syntax checking fails because it doesn't check the when {{ansible_version}}
+#- name: Installs haproxy packages
+#  package:
+#    name: "{{ item }}"
+#    state: present
+#  with_items: haproxy_packagenames

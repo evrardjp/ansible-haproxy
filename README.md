@@ -23,9 +23,52 @@ Example Playbook
 
 Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
 
-    - hosts: servers
+TO BE IMPROVED...
+
+    - hosts: all
+      vars:
+        haproxy_use_extra_config_folder: False
+        haproxy_ssl: True
+        haproxy_ssl_self_signed_regen: False
+        haproxy_services:
+          - name: galera
+            frontends:
+              - external:
+                  - ip: '127.0.0.1:6969'
+                    ssl_termination: True
+                  - ip: '127.0.0.1:6968'
+                    ssl_termination: False
+              - internal:
+                  - ip: '127.0.0.1:5555'
+                    ssl_termination: True
+                  - ip: '127.0.0.1:5556'
+                    ssl_termination: False
+            backends:
+              - servers:
+                  - ip: '127.0.0.1:3307'
+                  - ip: '127.0.0.1:3308'
+              - backups:
+                  - ip: '127.0.0.1:3309'
+          - name: horizon
+            frontends:
+              - external:
+                  - ip: '127.0.0.1:6970'
+                    ssl_termination: False
+                  - ip: '127.0.0.1:6971'
+                    ssl_termination: False
+              - internal:
+                  - ip: '127.0.0.1:5557'
+                    ssl_termination: True
+                  - ip: '127.0.0.1:5558'
+                    ssl_termination: False
+            backends:
+              - servers:
+                  - ip: '127.0.0.1:3310'
+                  - ip: '127.0.0.1:3311'
+              - backups:
+                  - ip: '127.0.0.1:3312'
       roles:
-         - { role: username.rolename, x: 42 }
+        - ansible-haproxy
 
 License
 -------
