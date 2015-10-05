@@ -9,7 +9,11 @@ frontend {{frontend.name}}
 
   {% endfor %}
   #The extra configuration
+  {% if frontend.balance_type is defined %}
   mode {{ frontend.balance_type }}
+  {% elif frontend.mode is defined %}
+  mode {{ frontend.mode }}
+  {% endif %}
   {% if frontend.maxconn is defined %}
   maxconn {{ frontend.maxconn }}
   {% endif %}
@@ -108,7 +112,9 @@ backend {{ backend.name }}
   {% if backend.balance is defined %}
   balance {{ backend.balance }}
   {% endif %}
-  {% if backend.mode is defined %}
+  {% if backend.balance_type is defined %}
+  mode {{ backend.balance_type }}
+  {% elfif backend.mode is defined %}
   mode {{ backend.mode }}
   {% endif %}
   {% if backend.log is defined %}
@@ -125,6 +131,9 @@ backend {{ backend.name }}
   {% endif %}
   {% if backend.contimeout is defined %}
   contimeout {{ backend.contimeout }}
+  {% endif %}
+  {% if backend.timeout_server is defined %}
+  timeout server {{ backend.timeout_server }}
   {% endif %}
   {% if backend.http_send_name_header is defined %}
   http-send-name-header {{ backend.http_send_name_header }}
