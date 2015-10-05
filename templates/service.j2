@@ -114,7 +114,7 @@ backend {{ backend.name }}
   {% endif %}
   {% if backend.balance_type is defined %}
   mode {{ backend.balance_type }}
-  {% elfif backend.mode is defined %}
+  {% elif backend.mode is defined %}
   mode {{ backend.mode }}
   {% endif %}
   {% if backend.log is defined %}
