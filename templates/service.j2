@@ -5,7 +5,7 @@
 frontend {{frontend.name}}
   #The binds
   {% for bind in frontend.binds %}
-  bind {{bind.ip}} {% if bind.ssl_termination is defined and bind.ssl_termination | bool %}ssl crt {{ bind.ssl_certificate | default (haproxy_ssl_pem) }} ciphers {{ bind.ssl_ciphers | default (haproxy_ssl_bind_cipher_suite) }}{% endif %}
+  bind {{bind.ip}}{% if bind.port is defined %}:{{ bind.port }}{% endif %}{% if bind.transparent is defined and bind.transparent | bool %} transparent{% endif %}{% if bind.ssl_termination is defined and bind.ssl_termination | bool %} ssl crt {{ bind.ssl_certificate | default (haproxy_ssl_pem) }} ciphers {{ bind.ssl_ciphers | default (haproxy_ssl_bind_cipher_suite) }}{% endif %}
 
   {% endfor %}
   #The extra configuration
