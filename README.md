@@ -86,7 +86,7 @@ Example Playbook
         haproxy_ssl: True
         haproxy_ssl_self_signed_regen: False
         haproxy_services:
-          - name: galera
+          galera:
             frontends:
               - name: galera-external
                 binds:
@@ -107,7 +107,7 @@ Example Playbook
                 backups:
                   - name: galera-3
                     ip: '127.0.0.1:3309'
-          - name: horizon
+          horizon:
             frontends:
               - name: external
                 binds:

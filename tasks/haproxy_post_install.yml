@@ -30,7 +30,7 @@
 - name: Generate files for the frontends and backends
   template:
     src: service.j2
-    dest: "/etc/haproxy/conf.d/{{ item.name }}"
-  with_items: haproxy_services
+    dest: "/etc/haproxy/conf.d/{{ item.key }}"
+  with_dict: haproxy_services
   when: haproxy_use_extra_config_folder | bool
   notify: Restart haproxy

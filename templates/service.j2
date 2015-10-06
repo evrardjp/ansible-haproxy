@@ -1,7 +1,7 @@
 #jinja2: lstrip_blocks: True, trim_blocks: True, keep_trailing_newline: True
-{% if item.frontends is defined and item.frontends | length > 0 %}
+{% if item.value.frontends is defined and item.value.frontends | length > 0 %}
 ## Frontends
-{% for frontend in item.frontends %}
+{% for frontend in item.value.frontends %}
 frontend {{frontend.name}}
   #The binds
   {% for bind in frontend.binds %}
@@ -93,9 +93,9 @@ frontend {{frontend.name}}
 {% endfor %}
 {% endif %}
 
-{% if item.backends is defined and item.backends | length > 0  %}
+{% if item.value.backends is defined and item.value.backends | length > 0  %}
 ## Backends
-{% for backend in item.backends %}
+{% for backend in item.value.backends %}
 backend {{ backend.name }}
   {% if backend.disabled is defined and backend.disabled | bool %}
   disabled
