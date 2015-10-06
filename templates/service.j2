@@ -52,7 +52,6 @@ frontend {{frontend.name}}
   {% if frontend.options is defined %}
   {% for option in frontend.options %}
   option {{ option }}
-
   {% endfor %}
   {% endif %}
   {% if frontend.redirects is defined %}
@@ -153,7 +152,6 @@ backend {{ backend.name }}
   {% if backend.options is defined %}
   {% for option in backend.options %}
   option {{ option }}
-
   {% endfor %}
   {% endif %}
 
