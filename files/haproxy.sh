@@ -38,8 +38,19 @@ then
   done
 fi
 
+check_haproxy_config()
+{
+        $HAPROXY -c -f "$CONFIG" >/dev/null
+        if [ $? -eq 1 ]; then
+                log_end_msg 1
+                exit 1
+        fi
+}
+
 haproxy_start()
 {
+        check_haproxy_config
+
         start-stop-daemon --start --pidfile "$PIDFILE" \
                 --exec $HAPROXY -- -f "$CONFIG" $CONFIG_DIR_FILES -D -p "$PIDFILE" \
                 $EXTRAOPTS || return 2
@@ -52,10 +63,13 @@ haproxy_stop()
                 # This is a success according to LSB
                 return 0
         fi
+
+        ret=0
         for pid in $(cat $PIDFILE) ; do
-                /bin/kill $pid || return 4
+                /bin/kill $pid || ret=$?
+
         done
-        rm -f $PIDFILE
+        [ $ret -eq 0 ] && rm -f $PIDFILE
         return 0
 }
 haproxy_reload()
