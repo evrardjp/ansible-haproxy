@@ -24,20 +24,17 @@ frontend {{frontend.name}}
   {% if frontend.monitor.fail is defined %}
   {% for condition in frontend.monitor.fail %}
   monitor fail {{ condition }}
-
   {% endfor %}
   {% endif %}
   {% endif %}
   {% if frontend.acls is defined %}
   {% for acl in frontend.acls %}
   acl {{ acl.name }} {{ acl.condition }}
-
   {% endfor %}
   {% endif %}
   {% if frontend.reqadd is defined %}
   {% for reqadd in frontend.reqadd %}
   reqadd {{ reqadd }}
-
   {% endfor %}
   {% endif %}
   {% if frontend.rate_limit_sessions is defined %}
@@ -46,7 +43,6 @@ frontend {{frontend.name}}
   {% if frontend.block is defined %}
   {% for block in frontend.block %}
   block {{ block }}
-
   {% endfor %}
   {% endif %}
   {% if frontend.options is defined %}
@@ -57,19 +53,16 @@ frontend {{frontend.name}}
   {% if frontend.redirects is defined %}
   {% for redirect in frontend.redirects %}
   redirect {{ redirect }}
-
   {% endfor %}
   {% endif %}
   {% if frontend.http_requests is defined %}
   {% for request in frontend.http_requests %}
   http-request {{ request.action }}{% if request.param is defined %} {{ request.param }}{% endif %}{% if request.condition is defined %} {{ request.condition }}{% endif %}
-
   {% endfor %}
   {% endif %}
   {% if frontend.tcp_requests is defined %}
   {% for request in frontend.tcp_requests %}
   tcp-request {{ request.param }} {{ request.value }}{% if request.condition is defined %} {{ request.condition }}{% endif %}
-
   {% endfor %}
   {% endif %}
   {% if frontend.x_fowarded_proto is defined and frontend.x_fowarded_proto == 'https' %}
@@ -83,7 +76,6 @@ frontend {{frontend.name}}
   {% if frontend.use_backends is defined %}
   {% for backend in frontend.use_backends %}
   use_backend {{ backend.name }} {{ backend.condition }}
-
   {% endfor %}
   {% endif %}
   {% if frontend.timeout_client is defined %}
@@ -125,7 +117,6 @@ backend {{ backend.name }}
   {% if backend.redirects is defined %}
   {% for redirect in backend.redirects %}
   redirect {{ redirect }}
-
   {% endfor %}
   {% endif %}
   {% if backend.contimeout is defined %}
@@ -140,13 +131,11 @@ backend {{ backend.name }}
   {% if backend.http_check_expect is defined %}
   {% for check_expect in backend.http_check_expect %}
   http-check expect {{ check_expect }}
-
   {% endfor %}
   {% endif %}
   {% if backend.http_requests is defined %}
   {% for request in backend.http_requests %}
   http-request {{ request.action }}{% if request.param is defined %} {{ request.param }}{% endif %}{% if request.condition is defined %} {{ request.condition }}{% endif %}
-
   {% endfor %}
   {% endif %}
   {% if backend.options is defined %}
