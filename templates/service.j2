@@ -143,6 +143,12 @@ backend {{ backend.name }}
   option {{ option }}
   {% endfor %}
   {% endif %}
+  {% if backend.stick_table is defined %}
+  stick-table {{ backend.stick_table }}
+  {% endif %}
+  {% if backend.stick_on is defined %}
+  stick on {{ backend.stick_on }}
+  {% endif %}
 
 {% endfor %}
 {% endif %}
