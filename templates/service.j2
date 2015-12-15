@@ -100,6 +100,12 @@ backend {{ backend.name }}
 
   {% endfor %}
   {% endif %}
+  {% if backend.backups is defined %}
+  {% for server in backend.backups %}
+  server {{ server.name }} {{ server.ip }}{% if server.port is defined %}:{{server.port }}{% endif %} {% if server.maxconn is defined %}maxconn {{server.maxconn }} {% endif %}{% if server.params is defined %}{% for param in server.params %}{{ param }} {% endfor %}{% endif %} backup
+
+  {% endfor %}
+  {% endif %}
   {% if backend.balance is defined %}
   balance {{ backend.balance }}
   {% endif %}
