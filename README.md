@@ -1,6 +1,8 @@
 Ansible HAProxy
 ===============
 
+[![Build Status](https://semaphoreci.com/api/v1/projects/67cc3c0d-550d-4d99-99ff-b01c40f899cc/552340/badge.svg)](https://semaphoreci.com/evrardjp/ansible-haproxy)
+
 This role installs haproxy based on your configuration, with a simple dict.
 
 Requirements
