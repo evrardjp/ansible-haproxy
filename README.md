@@ -22,9 +22,6 @@ Role Variables
    counterpart, for https use.
 * When ```haproxy_bind_on_non_local``` is set to True, the role will change
   your host sysctls to allow haproxy to bind on non-local ips.
-* When ```haproxy_use_extra_config_folder``` is set to True, the role will
-  deploy its configuration files into subfolders (in a conf.d folder inside
-  the haproxy default configuration folder of your OS).
 * When ```haproxy_webstats``` is set to True, webstats will be enabled for
   haproxy. You'll have to define the IP/port webstats will bind on
   (with ```haproxy_webstats_bind```) and the authentication credentials
@@ -84,7 +81,6 @@ Example Playbook
     ---
     - hosts: all
       vars:
-        haproxy_use_extra_config_folder: True
         haproxy_ssl: True
         haproxy_ssl_self_signed_regen: False
         haproxy_services:

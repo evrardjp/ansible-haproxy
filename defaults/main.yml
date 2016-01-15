@@ -28,7 +28,6 @@ haproxy_default_rise: 3
 haproxy_default_fall: 3
 
 haproxy_bind_on_non_local: False
-haproxy_use_extra_config_folder: False
 
 ## HAproxy base configuration variables. cf. vars/haproxy_* files.
 haproxy_defaults: []

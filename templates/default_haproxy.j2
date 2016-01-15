@@ -5,4 +5,4 @@ ENABLED=1
 #EXTRAOPTS="-de -m 16"
 
 # Conf.d style configuration dir. Init script has been hacked to support this.
-CONFIG_DIR={% if haproxy_use_extra_config_folder| bool %}{{ haproxy_extra_config_folder_path }}{% endif %}
+CONFIG_DIR={{ haproxy_extra_config_folder_path }}

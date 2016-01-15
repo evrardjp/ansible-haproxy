@@ -33,16 +33,13 @@
     src: haproxy.sh
     dest: /etc/init.d/haproxy
     mode: "0755"
-  when: >
-    ansible_os_family == 'Debian' and
-    haproxy_use_extra_config_folder | bool
+  when: ansible_os_family == 'Debian'
 
 - name: Create the extra configuration folder
   file:
     path: "{{ haproxy_extra_config_folder_path }}"
     state: directory
     recurse: yes
-  when: haproxy_use_extra_config_folder | bool
 
 - name: Enable the service
   service:

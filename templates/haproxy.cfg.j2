@@ -114,11 +114,3 @@ listen stats
   stats refresh {{ haproxy_webstats_refresh }}
   {% endif %}
 {% endif %}
-
-{% if haproxy_use_extra_config_folder is defined and haproxy_use_extra_config_folder == False %}
-## Services
-{% for item in haproxy_services %}
-#Definition of {{item.name}}
-#include 'service.j2' <-- This doesn't work right now.
-{% endfor %}
-{% endif %}
