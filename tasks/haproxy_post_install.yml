@@ -21,6 +21,11 @@
     state: present
   when: haproxy_bind_on_non_local | bool
 
+- name: Making sure the fragment folder exists
+  file:
+    path: "{{ haproxy_config_fragments_folder}}"
+    state: directory
+
 - name: Drop base haproxy config
   template:
     src: haproxy.cfg.j2
