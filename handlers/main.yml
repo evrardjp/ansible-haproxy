@@ -22,6 +22,7 @@
   assemble:
     src: "{{ haproxy_config_fragments_folder }}"
     dest: "{{ haproxy_server_configuration_folder }}/haproxy.cfg"
+    delimiter: "{{ haproxy_fragment_delimiter | default(omit)}}"
   notify: Restart haproxy
 
 - name: Restart haproxy
