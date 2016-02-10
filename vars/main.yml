@@ -12,7 +12,3 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-haproxy_server_configuration_folder: "/etc/haproxy"
-haproxy_extra_config_folder_path: "{{ haproxy_server_configuration_folder }}/conf.d"
-haproxy_service_name: haproxy

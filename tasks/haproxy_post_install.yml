@@ -24,12 +24,12 @@
 - name: Drop base haproxy config
   template:
     src: haproxy.cfg.j2
-    dest: "{{ haproxy_server_configuration_folder }}/haproxy.cfg"
-  notify: Restart haproxy
+    dest: "{{ haproxy_config_fragments_folder }}/00-haproxy.cfg"
+  notify: Regenerate haproxy configuration
 
 - name: Generate files for the frontends and backends
   template:
     src: service.j2
-    dest: "/etc/haproxy/conf.d/{{ item.key }}"
+    dest: "{{ haproxy_config_fragments_folder }}/{{ item.key }}"
   with_dict: haproxy_services
-  notify: Restart haproxy
+  notify: Regenerate haproxy configuration

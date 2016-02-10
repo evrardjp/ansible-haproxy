@@ -13,10 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-haproxy_packagenames:
-  - haproxy
-  - socat
-  - hatop
 haproxy_default_backend_options_http:
   - "forwardfor"
   - "httpchk"
@@ -26,14 +22,14 @@ haproxy_default_backend_options_https:
 haproxy_default_interval: 12000
 haproxy_default_rise: 3
 haproxy_default_fall: 3
-
 haproxy_bind_on_non_local: False
+haproxy_config_fragments_folder: "/etc/haproxy/conf.d"
 
 ## HAproxy base configuration variables. cf. vars/haproxy_* files.
-haproxy_defaults: []
-haproxy_global: []
+haproxy_defaults: {}
+haproxy_global: {}
 ## HAproxy backends and frontends
-haproxy_services: []
+haproxy_services: {}
 
 ## HAproxy webstats
 haproxy_webstats: False

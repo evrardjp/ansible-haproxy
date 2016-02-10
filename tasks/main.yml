@@ -19,10 +19,10 @@
    - "{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml"
    - "{{ ansible_distribution }}.yml"
    - "{{ ansible_os_family }}.yml"
-   - "main.yml"
+   - "default.yml"
 
 - include: haproxy_add_repo.yml
 - include: haproxy_install.yml
-- include: haproxy_ssl_certificates.yml
+- include: haproxy_ssl.yml
   when: haproxy_ssl | bool
 - include: haproxy_post_install.yml

@@ -13,31 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-- name: Drop user provided ssl cert and key
-  copy:
-    src: "{{ item.src }}"
-    dest: "{{ item.dest }}"
-    owner: "root"
-    group: "root"
-    mode: "{{ item.mode }}"
-  with_items:
-    - { src: "{{ haproxy_user_ssl_cert }}", dest: "{{ haproxy_ssl_cert }}", mode: "0644" }
-    - { src: "{{ haproxy_user_ssl_key }}", dest: "{{ haproxy_ssl_key }}", mode: "0640" }
-  when: haproxy_user_ssl_cert is defined and haproxy_user_ssl_key is defined
-  notify:
-    - regen pem
-
-- name: Drop user provided ssl CA cert
-  copy:
-    src: "{{ haproxy_user_ssl_ca_cert }}"
-    dest: "{{ haproxy_ssl_ca_cert }}"
-    owner: "root"
-    group: "root"
-    mode: "0644"
-  when: haproxy_user_ssl_ca_cert is defined
-  notify:
-    - regen pem
-
 - name: Remove signed certs and keys for regen
   file:
     dest: "{{ haproxy_ssl_cert }}"
@@ -57,5 +32,6 @@
     -out {{ haproxy_ssl_cert }}
     -extensions v3_ca
     creates={{ haproxy_ssl_cert }}
+  when: haproxy_user_ssl_cert is undefined or haproxy_user_ssl_key is undefined
   notify:
     - regen pem
