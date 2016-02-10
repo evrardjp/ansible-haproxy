@@ -21,7 +21,7 @@
 - name: Creating folder ssl cert folder
   file:
     path: "{{ haproxy_ssl_cert | dirname }}"
-    state: folder
+    state: directory
   when: sslcertfolder.stat.exists is undefined
 
 - name: Making sure ssl key folder exist
@@ -32,7 +32,7 @@
 - name: Creating folder ssl key folder
   file:
     path: "{{ haproxy_ssl_key | dirname }}"
-    state: folder
+    state: directory
   when: sslkeyfolder.stat.exists is undefined
 
 - name: Making sure ssl pem folder exist
@@ -43,7 +43,7 @@
 - name: Creating folder ssl pem folder
   file:
     path: "{{ haproxy_ssl_pem | dirname }}"
-    state: folder
+    state: directory
   when: sslpemfolder.stat.exists is undefined
 
 - include: haproxy_ssl_self_signed.yml
