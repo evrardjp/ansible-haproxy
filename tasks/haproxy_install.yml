@@ -55,12 +55,6 @@
 #    mode: "0755"
 #  when: ansible_os_family == 'Debian'
 
-- name: Create the configuration fragments folder
-  file:
-    path: "{{ haproxy_config_fragments_folder }}"
-    state: directory
-    recurse: yes
-
 - name: Enable the service
   service:
     name: "{{ haproxy_service_name }}"

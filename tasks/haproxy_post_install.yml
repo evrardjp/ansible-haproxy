@@ -21,10 +21,22 @@
     state: present
   when: haproxy_bind_on_non_local | bool
 
-- name: Making sure the fragment folder exists
+- name: Cleaning up the fragments folder
   file:
-    path: "{{ haproxy_config_fragments_folder}}"
+    path: "{{ haproxy_config_fragments_folder }}"
+    state: absent
+  when: haproxy_cleanup_fragments | bool
+
+- name: The configuration fragments folder should exist
+  file:
+    path: "{{ haproxy_config_fragments_folder }}"
     state: directory
+    recurse: yes
+
+#- name: Making sure the fragment folder exists
+#  file:
+#    path: "{{ haproxy_config_fragments_folder}}"
+#    state: directory
 
 - name: Drop base haproxy config
   template:
