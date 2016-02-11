@@ -27,6 +27,7 @@
     state: present
   with_items: haproxy_packagenames
   when: ansible_os_family == 'RedHat'
+  notify: Restart haproxy
 
 - name: Installs haproxy packages by apt
   apt:
@@ -34,6 +35,7 @@
     state: present
   with_items: haproxy_packagenames
   when: ansible_os_family == 'Debian'
+  notify: Restart haproxy
 
 - name: Installs haproxy packages by pkgin
   pkgin:
@@ -41,6 +43,7 @@
     state: present
   with_items: haproxy_packagenames
   when: ansible_os_family == 'Solaris'
+  notify: Restart haproxy
 
 #Disabling the conf.d idea to be closer to upstream.
 #- name: Replace haproxy defaults
