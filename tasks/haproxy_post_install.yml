@@ -21,15 +21,32 @@
     state: present
   when: haproxy_bind_on_non_local | bool
 
+- name: Cleaning up the fragments folder
+  file:
+    path: "{{ haproxy_config_fragments_folder }}"
+    state: absent
+  when: haproxy_cleanup_fragments | bool
+
+- name: The configuration fragments folder should exist
+  file:
+    path: "{{ haproxy_config_fragments_folder }}"
+    state: directory
+    recurse: yes
+
+#- name: Making sure the fragment folder exists
+#  file:
+#    path: "{{ haproxy_config_fragments_folder}}"
+#    state: directory
+
 - name: Drop base haproxy config
   template:
     src: haproxy.cfg.j2
-    dest: "{{ haproxy_server_configuration_folder }}/haproxy.cfg"
-  notify: Restart haproxy
+    dest: "{{ haproxy_config_fragments_folder }}/00-haproxy.cfg"
+  notify: Regenerate haproxy configuration
 
 - name: Generate files for the frontends and backends
   template:
     src: service.j2
-    dest: "/etc/haproxy/conf.d/{{ item.key }}"
+    dest: "{{ haproxy_config_fragments_folder }}/{{ item.key }}"
   with_dict: haproxy_services
-  notify: Restart haproxy
+  notify: Regenerate haproxy configuration

@@ -14,6 +14,9 @@
 # limitations under the License.
 
 haproxy_server_configuration_folder: "/etc/haproxy"
-haproxy_extra_config_folder_path: "{{ haproxy_server_configuration_folder }}/conf.d"
 haproxy_server_repo: "deb http://httpredir.debian.org/debian {{ ansible_distribution_release }}-backports main"
 haproxy_service_name: haproxy
+haproxy_packagenames:
+  - haproxy
+  - socat
+  - hatop

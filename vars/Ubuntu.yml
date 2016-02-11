@@ -14,6 +14,9 @@
 # limitations under the License.
 
 haproxy_server_configuration_folder: "/etc/haproxy"
-haproxy_extra_config_folder_path: "{{ haproxy_server_configuration_folder }}/conf.d"
 haproxy_service_name: haproxy
 haproxy_server_repo: "ppa:vbernat/haproxy-1.5"
+haproxy_packagenames:
+  - haproxy
+  - socat
+  - hatop
