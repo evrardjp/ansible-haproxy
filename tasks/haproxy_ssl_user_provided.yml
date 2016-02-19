@@ -23,6 +23,9 @@
   when:
     - haproxy_user_ssl_cert | default({})
     - haproxy_user_ssl_key | default({})
+  tags:
+    - haproxy-ssl
+    - haproxy-ssl-user-provided
   notify:
     - regen pem
 
@@ -36,6 +39,9 @@
   when:
     - haproxy_user_ssl_cert | default({})
     - haproxy_user_ssl_key | default({})
+  tags:
+    - haproxy-ssl
+    - haproxy-ssl-user-provided
   notify:
     - regen pem
 
@@ -47,5 +53,8 @@
     group: "root"
     mode: "0644"
   when: haproxy_user_ssl_ca_cert is defined
+  tags:
+    - haproxy-ssl
+    - haproxy-ssl-user-provided
   notify:
     - regen pem

@@ -18,6 +18,9 @@
     repo: "{{ haproxy_server_repo }}"
     state: present
     update_cache: yes
+  tags:
+    - haproxy-repos
+    - haproxy-apt-repos
 
 #- name: Drop haproxy repo pin
 #  template:

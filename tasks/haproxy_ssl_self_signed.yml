@@ -22,6 +22,10 @@
     - "{{ haproxy_ssl_key }}"
     - "{{ haproxy_ssl_cert }}"
   when: haproxy_ssl_self_signed_regen | bool
+  tags:
+    - haproxy-ssl
+    - haproxy-ssl-self-signed
+    - haproxy-ssl-self-signed-regenerate
 
 - name: Create self-signed ssl cert if no certificate exists
   command: >
@@ -33,5 +37,9 @@
     -extensions v3_ca
     creates={{ haproxy_ssl_cert }}
   when: haproxy_user_ssl_cert is undefined or haproxy_user_ssl_key is undefined
+  tags:
+    - haproxy-ssl
+    - haproxy-ssl-self-signed
+    - haproxy-ssl-self-signed-generate
   notify:
     - regen pem

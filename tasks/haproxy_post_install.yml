@@ -20,18 +20,25 @@
     sysctl_set: yes
     state: present
   when: haproxy_bind_on_non_local | bool
+  tags:
+    - haproxy-sysctl
 
 - name: Cleaning up the fragments folder
   file:
     path: "{{ haproxy_config_fragments_folder }}"
     state: absent
   when: haproxy_cleanup_fragments | bool
+  tags:
+    - haproxy-cleanup
+    - haproxy-config
 
 - name: The configuration fragments folder should exist
   file:
     path: "{{ haproxy_config_fragments_folder }}"
     state: directory
     recurse: yes
+  tags:
+    - haproxy-config
 
 #- name: Making sure the fragment folder exists
 #  file:
@@ -43,6 +50,9 @@
     src: haproxy.cfg.j2
     dest: "{{ haproxy_config_fragments_folder }}/00-haproxy.cfg"
   notify: Regenerate haproxy configuration
+  tags:
+    - haproxy-config
+    - haproxy-base-config
 
 - name: Generate files for the frontends and backends
   template:
@@ -50,3 +60,6 @@
     dest: "{{ haproxy_config_fragments_folder }}/{{ item.key }}"
   with_dict: haproxy_services
   notify: Regenerate haproxy configuration
+  tags:
+    - haproxy-config
+    - haproxy-service-config

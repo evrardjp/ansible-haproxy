@@ -17,34 +17,46 @@
   stat:
     path: "{{ haproxy_ssl_cert | dirname }}"
   register: sslcertfolder
+  tags:
+    - haproxy-ssl
 
 - name: Creating folder ssl cert folder
   file:
     path: "{{ haproxy_ssl_cert | dirname }}"
     state: directory
   when: sslcertfolder.stat.exists is undefined
+  tags:
+    - haproxy-ssl
 
 - name: Making sure ssl key folder exist
   stat:
     path: "{{ haproxy_ssl_key | dirname }}"
   register: sslkeyfolder
+  tags:
+    - haproxy-ssl
 
 - name: Creating folder ssl key folder
   file:
     path: "{{ haproxy_ssl_key | dirname }}"
     state: directory
   when: sslkeyfolder.stat.exists is undefined
+  tags:
+    - haproxy-ssl
 
 - name: Making sure ssl pem folder exist
   stat:
     path: "{{ haproxy_ssl_pem | dirname }}"
   register: sslpemfolder
+  tags:
+    - haproxy-ssl
 
 - name: Creating folder ssl pem folder
   file:
     path: "{{ haproxy_ssl_pem | dirname }}"
     state: directory
   when: sslpemfolder.stat.exists is undefined
+  tags:
+    - haproxy-ssl
 
 - include: haproxy_ssl_self_signed.yml
   when:
