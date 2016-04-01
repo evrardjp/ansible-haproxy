@@ -102,6 +102,7 @@ defaults
 
 {% if haproxy_webstats | bool %}
 listen stats
+  bind {{ '127.0.0.1:1936' if haproxy_webstats_bind is undefined else haproxy_webstats_bind }}
   mode {{ 'http' if haproxy_webstats_mode is undefined else haproxy_webstats_mode }}
   stats enable
   stats uri {{ '/' if haproxy_webstats_uri is undefined else haproxy_webstats_uri }}
