@@ -15,12 +15,16 @@
 
 # EPEL is only needed if Centos/RHEL < 5
 - include: haproxy_add_epel_repo.yml
-  when: >
-    ansible_os_family == 'RedHat' and
-    (ansible_distribution_major_version | version_compare ('5','<'))
+  when:
+    - ansible_os_family == 'RedHat'
+    - (ansible_distribution_major_version | version_compare ('5','<'))
+  tags:
+    - haproxy-repos
 
 # New repo for haproxy is only needed if Ubuntu or Debian < Jessie
 - include: haproxy_add_apt_repo.yml
-  when: >
+  when:
     ansible_distribution == 'Ubuntu' or
     (ansible_distribution == 'Debian' and (ansible_distribution_major_version | version_compare ('8','<')))
+  tags:
+    - haproxy-repos

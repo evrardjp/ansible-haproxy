@@ -13,6 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+- include: haproxy_ssl.yml
+  when: haproxy_ssl | bool
+  tags:
+    - haproxy-ssl
+
 - name: Make haproxy bindable on non local addresses
   sysctl:
     name: net.ipv4.ip_nonlocal_bind
@@ -22,44 +27,3 @@
   when: haproxy_bind_on_non_local | bool
   tags:
     - haproxy-sysctl
-
-- name: Cleaning up the fragments folder
-  file:
-    path: "{{ haproxy_config_fragments_folder }}"
-    state: absent
-  when: haproxy_cleanup_fragments | bool
-  tags:
-    - haproxy-cleanup
-    - haproxy-config
-
-- name: The configuration fragments folder should exist
-  file:
-    path: "{{ haproxy_config_fragments_folder }}"
-    state: directory
-    recurse: yes
-  tags:
-    - haproxy-config
-
-#- name: Making sure the fragment folder exists
-#  file:
-#    path: "{{ haproxy_config_fragments_folder}}"
-#    state: directory
-
-- name: Drop base haproxy config
-  template:
-    src: haproxy.cfg.j2
-    dest: "{{ haproxy_config_fragments_folder }}/00-haproxy.cfg"
-  notify: Regenerate haproxy configuration
-  tags:
-    - haproxy-config
-    - haproxy-base-config
-
-- name: Generate files for the frontends and backends
-  template:
-    src: service.j2
-    dest: "{{ haproxy_config_fragments_folder }}/{{ item.key }}"
-  with_dict: haproxy_services
-  notify: Regenerate haproxy configuration
-  tags:
-    - haproxy-config
-    - haproxy-service-config

@@ -17,6 +17,15 @@ haproxy_bind_on_non_local: False
 haproxy_config_fragments_folder: "/etc/haproxy/conf.d"
 haproxy_cleanup_fragments: False
 
+### if you don't have the luxury to do a skip tags in command line,
+## you may want to override this in order to execute only the tasks
+## you want to run.
+##haproxy_run_steps:
+haproxy_pre_install: True
+haproxy_install: True
+haproxy_post_install: True
+haproxy_config: True
+
 ## HAproxy base configuration variables. cf. vars/haproxy_* files.
 haproxy_defaults: {}
 haproxy_global: {}

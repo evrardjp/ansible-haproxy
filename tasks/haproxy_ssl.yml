@@ -18,7 +18,7 @@
     path: "{{ haproxy_ssl_cert | dirname }}"
   register: sslcertfolder
   tags:
-    - haproxy-ssl
+    - haproxy-ssl-certfolder
 
 - name: Creating folder ssl cert folder
   file:
@@ -26,14 +26,14 @@
     state: directory
   when: sslcertfolder.stat.exists is undefined
   tags:
-    - haproxy-ssl
+    - haproxy-ssl-certfolder
 
 - name: Making sure ssl key folder exist
   stat:
     path: "{{ haproxy_ssl_key | dirname }}"
   register: sslkeyfolder
   tags:
-    - haproxy-ssl
+    - haproxy-ssl-keyfolder
 
 - name: Creating folder ssl key folder
   file:
@@ -41,14 +41,14 @@
     state: directory
   when: sslkeyfolder.stat.exists is undefined
   tags:
-    - haproxy-ssl
+    - haproxy-ssl-keyfolder
 
 - name: Making sure ssl pem folder exist
   stat:
     path: "{{ haproxy_ssl_pem | dirname }}"
   register: sslpemfolder
   tags:
-    - haproxy-ssl
+    - haproxy-ssl-pemfolder
 
 - name: Creating folder ssl pem folder
   file:
@@ -56,11 +56,15 @@
     state: directory
   when: sslpemfolder.stat.exists is undefined
   tags:
-    - haproxy-ssl
+    - haproxy-ssl-pemfolder
 
 - include: haproxy_ssl_self_signed.yml
   when:
     - haproxy_ssl | bool
     - haproxy_user_ssl_cert is undefined or haproxy_user_ssl_key is undefined
+  tags:
+    - haproxy-ssl-self-signed
 
 - include: haproxy_ssl_user_provided.yml
+  tags:
+    - haproxy-ssl-user-provided
