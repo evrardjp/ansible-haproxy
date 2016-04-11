@@ -47,7 +47,7 @@
   template:
     src: service.j2
     dest: "{{ haproxy_config_fragments_folder }}/{{ item.key }}"
-  with_dict: haproxy_services
+  with_dict: "{{ haproxy_services }}"
   notify: Regenerate haproxy configuration
   tags:
     - haproxy-service-config

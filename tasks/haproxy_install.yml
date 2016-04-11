@@ -25,7 +25,7 @@
   yum:
     name: "{{ item }}"
     state: present
-  with_items: haproxy_packagenames
+  with_items: "{{ haproxy_packagenames }}"
   when: ansible_os_family == 'RedHat'
   notify: Restart haproxy
   tags:
@@ -36,7 +36,7 @@
   apt:
     name: "{{ item }}"
     state: present
-  with_items: haproxy_packagenames
+  with_items: "{{ haproxy_packagenames }}"
   when: ansible_os_family == 'Debian'
   notify: Restart haproxy
   tags:
@@ -47,7 +47,7 @@
   pkgin:
     name: "{{ item }}"
     state: present
-  with_items: haproxy_packagenames
+  with_items: "{{ haproxy_packagenames }}"
   when: ansible_os_family == 'Solaris'
   notify: Restart haproxy
   tags:
