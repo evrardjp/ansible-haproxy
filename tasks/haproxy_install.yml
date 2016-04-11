@@ -29,6 +29,7 @@
   when: ansible_os_family == 'RedHat'
   notify: Restart haproxy
   tags:
+    - haproxy-packages
     - haproxy-yum-packages
 
 - name: Installs haproxy packages by apt
@@ -39,6 +40,7 @@
   when: ansible_os_family == 'Debian'
   notify: Restart haproxy
   tags:
+    - haproxy-packages
     - haproxy-apt-packages
 
 - name: Installs haproxy packages by pkgin
@@ -49,6 +51,7 @@
   when: ansible_os_family == 'Solaris'
   notify: Restart haproxy
   tags:
+    - haproxy-packages
     - haproxy-pkgin-packages
 
 #Disabling the conf.d idea to be closer to upstream.

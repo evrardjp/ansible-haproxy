@@ -17,7 +17,6 @@
   shell: yum repolist | grep -qi EPEL
   register: epel_repo_present
   tags:
-    - haproxy-repos
     - haproxy-yum-repos
 
 - name: Add epel repo
@@ -29,5 +28,4 @@
     mode: "0644"
   when: epel_repo_present.rc != 0
   tags:
-    - haproxy-repos
     - haproxy-yum-repos

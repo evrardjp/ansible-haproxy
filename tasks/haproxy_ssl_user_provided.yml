@@ -24,8 +24,7 @@
     - haproxy_user_ssl_cert | default({})
     - haproxy_user_ssl_key | default({})
   tags:
-    - haproxy-ssl
-    - haproxy-ssl-user-provided
+    - haproxy-ssl-user-provided-certcopy
   notify:
     - regen pem
 
@@ -40,8 +39,7 @@
     - haproxy_user_ssl_cert | default({})
     - haproxy_user_ssl_key | default({})
   tags:
-    - haproxy-ssl
-    - haproxy-ssl-user-provided
+    - haproxy-ssl-user-provided-keycopy
   notify:
     - regen pem
 
@@ -54,7 +52,6 @@
     mode: "0644"
   when: haproxy_user_ssl_ca_cert is defined
   tags:
-    - haproxy-ssl
-    - haproxy-ssl-user-provided
+    - haproxy-ssl-user-provided-cacopy
   notify:
     - regen pem
