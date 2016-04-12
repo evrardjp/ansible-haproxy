@@ -14,18 +14,18 @@ global
   log 127.0.0.1 local1 notice
 {% endif %}
 {% if haproxy_global.uid is defined %}
-    uid {{ haproxy_global.uid }}
+  uid {{ haproxy_global.uid }}
 {% elif haproxy_global.user is defined %}
-    user {{ haproxy_global.user }}
+  user {{ haproxy_global.user }}
 {% else %}
-  uid haproxy
+  user haproxy
 {% endif %}
 {% if haproxy_global.gid is defined %}
-    gid {{ haproxy_global.gid }}
+  gid {{ haproxy_global.gid }}
 {% elif haproxy_global.group is defined %}
-    group {{ haproxy_global.group }}
+  group {{ haproxy_global.group }}
 {% else %}
-  gid haproxy
+  group haproxy
 {% endif %}
   chroot {{ '/var/lib/haproxy' if haproxy_global.chroot_folder is undefined else haproxy_global.chroot_folder}}
 {% if haproxy_global.daemon is defined and haproxy_global.daemon == true %}
