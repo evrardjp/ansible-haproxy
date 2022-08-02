@@ -160,64 +160,7 @@ None
 
 ## Example Playbook
 
-    ---
-    - hosts: all
-      vars:
-        haproxy_ssl: True
-        haproxy_ssl_self_signed_regen: False
-        haproxy_services:
-          galera:
-            frontends:
-              - name: galera-external
-                binds:
-                  - ip: '127.0.0.1:3400'
-                  - ip: '127.0.0.1:3401'
-                balance_type: 'tcp'
-              - name: galera-internal
-                binds:
-                  - ip: '127.0.0.1:3402'
-                balance_type: 'tcp'
-            backends:
-              - name: galera-backend-servers
-                servers:
-                  - name: galera-1
-                    ip: '127.0.0.1:3307'
-                  - name: galera-2
-                    ip: '127.0.0.1:3308'
-                backups:
-                  - name: galera-3
-                    ip: '127.0.0.1:3309'
-          horizon:
-            frontends:
-              - name: external
-                binds:
-                  - ip: '127.0.0.1:9443'
-                    ssl_termination: True
-                    #ssl_certificate: "/etc/ssl/certs/mycert.pem"
-                    ssl_ciphers: "ECDH+AESGCM:DH+AESGCM:ECDH+AES256:DH+AES256:ECDH+AES128:DH+AES:ECDH+3DES:DH+3DES:RSA+AESGCM:RSA+AES:RSA+3DES:!aNULL:!MD5:!DSS"
-                  - ip: '127.0.0.1:9444'
-                    ssl_termination: False
-                balance_type: 'http'
-              - name: internal
-                binds:
-                  - ip: '127.0.0.1:7443'
-                    ssl_termination: True
-                  - ip: '127.0.0.1:7444'
-                    ssl_termination: False
-                balance_type: 'http'
-            backends:
-              - name: horizon-backends
-                servers:
-                  - name: horizon-1
-                    ip: '127.0.0.1:80'
-                  - name: horizon-2
-                    ip: '127.0.0.1:81'
-                backups:
-                  - name: horizon-3
-                    ip: '127.0.0.1:82'
-      roles:
-        - ansible-haproxy
-
+TODO
 
 ## License
 
