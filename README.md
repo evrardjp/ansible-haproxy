@@ -1,3 +1,7 @@
+A simple yet powerful role to install/configure HAProxy
+=======================================================
+
+
 There are multiple roles to configure HAProxy.
 
 Here is what I bring this role back from the dead:
@@ -45,18 +49,21 @@ From the HAProxy configuration guide:
 are generally set once for all and do not need being changed once correct. Some
 of them have command-line equivalents."
 
-This role will:
-- Ensure the role is close to the default OS specific globals.
-  If a variable is different than the OS standard global, it will be documented in a git commit history.
-- Allow these sections to be templated from user configuration, as simply as possible.
-- Allow these sections to be passed-through from user configuration and user files.
-- Ensure the configuration from the templated variables can't produce dumb configuration:
-  If some variables are not matching HAProxy expected behaviour, an error has to be raised before the file is sent to the remote node for final validation.
+This role:
+- Allows HAProxy sections to be templated from user variables, as simply as possible.
+- Allows HAProxy sections to be passed-through from user configuration and user files.
+- Ensures the configuration from the templated variables can't produce dumb configuration:
+  If some variables are not matching HAProxy expected behaviour, an error has
+  to be raised before the file is sent to the remote node for final validation.
+- Is close to the default OS specific globals. If a variable is different than the OS
+  standard global, it will be documented in a git commit history, and easy to follow.
 
-## High level view of variables
+## Variables
+
+### Variables related to OS
 
 * When ```haproxy_bind_on_non_local``` is set to True, the role will change
-  the HAProxy host sysctls to allow HAProxy to bind on non-local ips.
+  the HAProxy host sysctls to allow HAProxy to bind on non-local IPs.
   It is possible to override it per address family (IPv4/IPv6) too.
 
 * ```haproxy_packages``` is the list of packages that will be installed on
@@ -86,6 +93,7 @@ This role will:
   binary names, service names) are stored in vars/ folder (one file per distro).
   If this doesn't work for a case, please submit a PR.
 
+### Variables related to HAProxy configuration
 
 * ```haproxy_globals```: This is an optional dict containing HAProxy's
   "global" configuration directive. This will be merged with:
@@ -102,7 +110,7 @@ This role will:
   * ```haproxy_backends```
   * ```haproxy_listens```
 
-## Fragments handling
+### Variables related to fragments handling for HAProxy configuration
 
 The HAProxy "running" configuration is a generated as an assembly of fragments.
 At the opposite of other roles, the fragments are stored **locally** in ``haproxy_fragments_folder``. This will allow full overrides.
@@ -112,18 +120,25 @@ Each fragement is generated based on the dicts explained above. (See also low le
 To be more precise, each fragment corresponds to a single top level configuration section (i.e. one fragment per frontend, backend, listen, ...)
 
 Here are a few variables linked to fragment handling:
-* As HAProxy order configuration matters, fragments filename will be defined by default as <index>-<name>.
-  This can be overriden by the deployer, by defining `fragment_index` (see below).
-  Indexes will by default be:
-  * A<number> for globals
-  * B<number> for defaults
-  * C<number> for listens
-  * D<number> for frontends
-  * E<number> for backends
-  * F<number> for fastcgi-apps
-  * G<number> for userlists
-  * H<number> for resolvers
-  * I<number> for caches
+
+* As HAProxy order configuration matters, fragments filename will be defined by default as the following:
+  * 001_global for globals
+  * 002_default for defaults
+  * 003_listen_<name> for listens
+  * 004_frontend_<name> for frontends
+  * 005_backend_<name> for backends
+  * 006_<type>_<name> for the following types:
+    * userlist
+    * cache
+    * http-errors
+    * mailers
+    * resolvers
+    * fcgi-app
+    * peers
+    * aggregations
+    * program
+    * dynamic-update
+    * ring
 
 * The HAProxy configuration files (fragments) are stored in a local folder on the ansible node before
   all the fragments are merged together. This local folder location is stored in ``haproxy_fragments_folder``.
@@ -140,7 +155,7 @@ Here are a few variables linked to fragment handling:
   ```
   Of course content can be a longer string (use the ``|`` sign for example) or a variable (use a lookup plugin for example).
 
-  Destination fragment filename will always be defined as <index number>-user.
+  Destination fragment filename will always be defined as 000_user_<index>.
   Changing the order of your list in user_fragments will change the haproxy configuration by changing its order.
 
   Side notes about user fragments:
@@ -149,78 +164,50 @@ Here are a few variables linked to fragment handling:
     sections, make sure to override the role generation by adding the setting the following variables.
     ``haproxy_globals_merged: {}`` (for global) and/or ``haproxy_defaults_merged: {}`` for defaults.
 
-* A default variable, named ``haproxy_fragments``, will list the default fragments to assemble together.
-  This list will be automatically populated from the variables
-  ``haproxy_{frontends,backends,listens,defaults,globals}`` and ``haproxy_user_fragments``
+* A default variable, named ``haproxy_fragments``, will list the fragments to assemble together.
+  This list will be by default populated as following:
+  * The path to the 001_global file (as explained above, this file is templated from `haproxy_globals_merged`)
+  * The path to the 002_default file (as explained above, this file is templated from `haproxy_defaults_merged`)
+  * The paths to each frontend/backend/listen/... fragments (as explained above, generated from)
+    ``haproxy_{frontends,backends,listens}`` and from convenience variables.
+  * The paths to each user fragment 000_user_*
 
   The ``haproxy_fragments`` ensures that HAProxy configuration is always up to date,
   the generation is idempotent, and the user doesn't need to define a variable to "clean the state".
   This is more robust than assembling all the files from the ``haproxy_fragments_folder``, as
   the latter might is not defined as desired state/might contain outdated files.
   
-  CAUTION: Any configuration file not appearing in the `haproxy_fragments` list will be deleted on the
-  `haproxy_fragments_folder` on the local ansible machine before sending to the haproxy node!
+  CAUTION: Any configuration file in the `haproxy_fragments_folder` AND not in the
+  `haproxy_fragments` list will be deleted in the `haproxy_fragments_folder` on
+   the local ansible machine before sending to the haproxy node.
 
-## Low level view of variables
-
-TODO
-
-## Convenience tools
+### Variables related to convenience: Useful HAProxy fragments
 
 Here are some variables which will automatically create some frontend/backend/listen fragments.
 
-### Stats
+#### Stats website
 
-HAProxy has an internal way of gathering statistics, and can show it to the
-user/deployer. Here are variables altering the stats behaviour.
+TODO
 
-* When ```haproxy_webstats``` is set to True, webstats will be enabled for
-  haproxy. You'll have to define the IP/port webstats will bind on
-  (with ```haproxy_webstats_bind```) and the authentication credentials
-  (with ```haproxy_webstats_auth```)
-* Still for the webstats, you can define ```haproxy_webstats_hide_version```,
-  ```haproxy_webstats_uri``` and ```haproxy_webstats_realm```.
-  The use of these variables should be self explanatory. You can still check
-  on HAProxy upstream documentation, if needed.
-* ```haproxy_localstats``` is a way to enable/disable local socket for
-  managing haproxy. It can be used with hatop and/or socat. By default, the
-  local stats socket is enabled, with admin mode. The level of the access
-  can be modified by replacing 'level admin' with the level you need
-  in the variable ```haproxy_localstats_level```.
-* A variable ```haproxy_localstats_timeout``` exists if you want to
-  define a timeout on the localstats socket. Cf. upstream documentation.
+#HAProxy has an internal way of gathering statistics, and can show it to the
+#user/deployer. Here are variables altering the stats behaviour.
+#
+#* When ```haproxy_webstats``` is set to True, webstats will be enabled for
+#  haproxy. You'll have to define the IP/port webstats will bind on
+#  (with ```haproxy_webstats_bind```) and the authentication credentials
+#  (with ```haproxy_webstats_auth```)
+#* Still for the webstats, you can define ```haproxy_webstats_hide_version```,
+#  ```haproxy_webstats_uri``` and ```haproxy_webstats_realm```.
+#  The use of these variables should be self explanatory. You can still check
+#  on HAProxy upstream documentation, if needed.
+#* ```haproxy_localstats``` is a way to enable/disable local socket for
+#  managing haproxy. It can be used with hatop and/or socat. By default, the
+#  local stats socket is enabled, with admin mode. The level of the access
+#  can be modified by replacing 'level admin' with the level you need
+#  in the variable ```haproxy_localstats_level```.
+#* A variable ```haproxy_localstats_timeout``` exists if you want to
+#  define a timeout on the localstats socket. Cf. upstream documentation.
 
-## Distributions variables
-
-These variables are defined per distribution, and define package names, paths
-to binaries, binaries names, etc. They are stored in vars/ folder (one file
-per distro).
-
-## Other ansible default variables
-
-* ```haproxy_packages``` is the list of packages that will be installed on
-  the deployed system. By default, onlu HAProxy is installed.
-  Extra packages might be useful to manage HAProxy, for example socat, hatop,
-  or haproxyctl.
-
-  To have install those packages, override ``haproxy_packages`` like this:
-  ```
-  haproxy_extrapackages:
-    - "nc"
-  haproxy_packages: "{{ _haproxy_packages + haproxy_extrapackages }}"
-  ```
-
-  Notes:
-  * You are not forced to use an extra variable, you can simply concat
-    with "+". This extra variable is only used in docs for readability.
-  * We already provide a convenience variable named ``_haproxy_extrapackages``
-    containing hatop and socat. Add it to your ``haproxy_packages`` if you
-    want hatop and socat installed.
-
-* ``haproxy_packages_state`` clarifies the intent behind the package installation.
-  By default it is only intended to have HAProxy installed. It is possible to ensure
-  always the latest version of the package is installed by setting:
-  ``haproxy_packages_state: "latest"``
 
 ## Dependencies
 
@@ -228,7 +215,7 @@ None
 
 ## Example Playbook
 
-TODO
+TODO, particularly if other repos are necessary.
 
 ## License
 
