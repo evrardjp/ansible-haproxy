@@ -76,33 +76,61 @@ This role will:
 ## Fragments handling
 
 The HAProxy "running" configuration is a generated as an assembly of fragments.
-At the opposite of other roles, the fragments are stored _local_. This will allow full overrides.
+At the opposite of other roles, the fragments are stored **locally** in ``haproxy_fragments_folder``. This will allow full overrides.
 The assembled file is validated on a temp file on the remote machine before overriding the production configuration.
 
 Each fragement is generated based on the dicts explained above. (See also low level view of variables for more details).
 To be more precise, each fragment corresponds to a single top level configuration section (i.e. one fragment per frontend, backend, listen, ...)
 
 Here are a few variables linked to fragment handling:
-* As HAProxy order configuration matters, fragments filename will be defined by default as <type>-<name>-<index>.
-  This can be overriden by the deployer, by defining `fragment_name` (see below)
-* 
-  The HAProxy configuration files (fragments) are stored in a local folder on the ansible node before
+* As HAProxy order configuration matters, fragments filename will be defined by default as <index>-<name>.
+  This can be overriden by the deployer, by defining `fragment_index` (see below).
+  Indexes will by default be:
+  * A<number> for globals
+  * B<number> for defaults
+  * C<number> for listens
+  * D<number> for frontends
+  * E<number> for backends
+  * F<number> for fastcgi-apps
+  * G<number> for userlists
+  * H<number> for resolvers
+  * I<number> for caches
+
+* The HAProxy configuration files (fragments) are stored in a local folder on the ansible node before
   all the fragments are merged together. This local folder location is stored in ``haproxy_fragments_folder``.
+  This defaults to ``/var/cache/ansible/haproxy-role/``. This folder has been chosen to respect the FHS 3.0.
+  See also: https://refspecs.linuxfoundation.org/FHS_3.0/fhs/ch05s05.html .
+
+* A user can bring its own files by defining their path (they will be copied using the copy module) or their
+  content. For that, the user needs to define ``haproxy_user_fragments``.
+  Example:
+  ```
+  haproxy_user_fragments:
+    - src: <filename>
+    - content: "# haproxy valid content"
+  ```
+  Of course content can be a longer string (use the ``|`` sign for example) or a variable (use a lookup plugin for example).
+
+  Destination fragment filename will always be defined as <index number>-user.
+  Changing the order of your list in user_fragments will change the haproxy configuration by changing its order.
+
+  Side notes about user fragments:
+  * They are not validated by this role configuration, only validated by haproxy
+  * haproxy doesn't allow two "global" or two "default" definitions. To have a user fragment for those
+    sections, make sure to override the role generation by adding the setting the following variables.
+    ``haproxy_globals_merged: {}`` (for global) and/or ``haproxy_defaults_merged: {}`` for defaults.
 
 * A default variable, named ``haproxy_fragments``, will list the default fragments to assemble together.
   This list will be automatically populated from the variables
-  ``haproxy_frontends_all``, ``haproxy_backends_all``, ``haproxy_listens_all``, which are
-  indirectly populated from respectively ``haproxy_frontends``, ``haproxy_backends``, and ``haproxy_listens``.
-  (the ``_all`` are there for convenience, see section below).
+  ``haproxy_{frontends,backends,listens,defaults,globals}`` and ``haproxy_user_fragments``
 
   The ``haproxy_fragments`` ensures that HAProxy configuration is always up to date,
   the generation is idempotent, and the user doesn't need to define a variable to "clean the state".
-  At the opposite of copying all the files in the assembly folder, which might contain outdated files.
-
-  This feature is useful to bring an external file fragment, and assemble it with the rest.
+  This is more robust than assembling all the files from the ``haproxy_fragments_folder``, as
+  the latter might is not defined as desired state/might contain outdated files.
   
   CAUTION: Any configuration file not appearing in the `haproxy_fragments` list will be deleted on the
-  `haproxy_fragments_folder` on the local ansible machine!
+  `haproxy_fragments_folder` on the local ansible machine before sending to the haproxy node!
 
 ## Low level view of variables
 
@@ -146,7 +174,7 @@ per distro).
   on Ubuntu. The first two are useful for managing haproxy. You can override
   this list with your own packages.
   To extend the list, can define in your vars:
-  ``haproxy_packages: "{{ _haproxy_packages + [ "myextrapackage" ] }}"
+  ``haproxy_packages: "{{ _haproxy_packages + [ "myextrapackage" ] }}"``
 
 * ```haproxy_server_repo``` is the repo url used for installing a recent haproxy
   with packages.
