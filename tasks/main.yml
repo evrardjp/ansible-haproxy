@@ -55,9 +55,9 @@
     - haproxy-sysctl
     - haproxy-install
 
-#- include: haproxy_config.yml
-#  tags:
-#    - haproxy-config
+- ansible.builtin.import_tasks: haproxy_config.yml
+  tags:
+    - haproxy-config
 
 - name: Ensuring haproxy is enabled and started
   ansible.builtin.service:

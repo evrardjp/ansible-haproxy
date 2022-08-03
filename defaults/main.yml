@@ -22,3 +22,8 @@ haproxy_packages_state: "present"
 # ``haproxy_bind_on_non_local_ipv4`` or
 # ``haproxy_bind_on_non_local_ipv6``
 haproxy_bind_on_non_local: false
+
+haproxy_user_fragments: []
+
+# Fragments default location
+haproxy_fragments_folder: "/var/cache/ansible/haproxy-role/"
