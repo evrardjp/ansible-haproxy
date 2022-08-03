@@ -13,6 +13,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+- name: restart haproxy
+  ansible.builtin.service:
+    name: "{{ haproxy_service_name }}"
+    state: "restarted"
+  register: _haproxyservicerestart
+  when:
+    - _haproxyservicestart is not changed
+  tags:
+    - haproxy-restart
+
+# TODO: Improve this with native haproxy behaviour
+- name: reload haproxy
+  ansible.builtin.service:
+    name: "{{ haproxy_service_name }}"
+    state: "reloaded"
+  register: _servicereload
+  when:
+    - _haproxyservicestart is not changed
+    - _haproxyservicerestart is not defined
+  tags:
+    - haproxy-reload
+
 # TODO: Refactor, old content
 - name: Regenerate haproxy configuration
   assemble:
@@ -22,13 +44,3 @@
   notify: Restart haproxy
   tags:
     - haproxy-config
-
-- name: Restart haproxy
-  service:
-    name: "{{ haproxy_service_name }}"
-    state: "restarted"
-    pattern: "haproxy"
-  tags:
-    - haproxy-init
-    - haproxy-service
-    - haproxy-restart

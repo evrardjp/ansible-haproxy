@@ -58,3 +58,14 @@
 #- include: haproxy_config.yml
 #  tags:
 #    - haproxy-config
+
+- name: Ensuring haproxy is enabled and started
+  ansible.builtin.service:
+    daemon_reload: true
+    name: "{{ haproxy_service_name }}"
+    state: "started"
+    enabled: true
+    masked: false
+  register: _haproxyservicestart
+  tags:
+    - haproxy-install
