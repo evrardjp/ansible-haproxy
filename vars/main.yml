@@ -865,3 +865,13 @@ haproxy_supported_keywords:
     - transparent
     - use-fcgi-app
     - use-server
+
+haproxy_recommended_keywords:
+  default:
+    - timeout client
+    - timeout connect
+    - timeout server
+  frontend:
+    - bind
+  listen:
+    - bind
