@@ -23,7 +23,13 @@ haproxy_packages_state: "present"
 # ``haproxy_bind_on_non_local_ipv6``
 haproxy_bind_on_non_local: false
 
+# User fragments
 haproxy_user_fragments: []
+
+# Global
+## User provided
+haproxy_globals: {}
+haproxy_globals_merged: "{{ [ haproxy_globals_osdefaults, haproxy_globals_roledefaults, haproxy_globals ] | combine }}"
 
 # Fragments default location
 haproxy_fragments_folder: "/var/cache/ansible/haproxy-role/"

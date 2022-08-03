@@ -1,5 +1,6 @@
 ---
-- hosts: localhost,
+- name: Test user fragments are generated from src or content
+  hosts: localhost
   connection: local
   vars:
     haproxy_fragments_folder: "{{ playbook_dir }}/fragments/"
@@ -12,6 +13,10 @@
       - src: "{{ playbook_dir }}/my_user_fragment"
       - content: |
           listen awesome
+            bind :4444
+            timeout connect         10s
+            timeout client          1m
+            timeout server          1m
   tasks:
     - name: Create a temp folder for fragments
       ansible.builtin.file:

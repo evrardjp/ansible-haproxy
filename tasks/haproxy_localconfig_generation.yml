@@ -1,0 +1,74 @@
+---
+# Copyright 2022, Jean-Philippe Evrard <open-source@a.spamming.party>
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Ensuring fragments folder exists
+  ansible.builtin.file:
+    path: "{{ haproxy_fragments_folder }}"
+    state: directory
+    recurse: true
+
+- name: Copying the user fragments
+  ansible.builtin.copy:
+    remote_src: false
+    src: "{{ item.src | default(omit) }}"
+    content: "{{ item.content | default(omit) }}"
+    dest: "{{ haproxy_fragments_folder | dirname }}/000_user_{{ index }}.cfg"
+    mode: "0640"
+  loop: "{{ haproxy_user_fragments }}"
+  loop_control:
+    index_var: index
+  register: _copied_user_fragments
+
+- name: Sanity check on user input before generating the global fragment
+  ansible.builtin.fail:
+    msg: "Fragment for global cannot be generated, incorrect keyword requested"
+  when:
+    - haproxy_globals_merged.keys() | list | difference(haproxy_supported_keywords['global'])
+    - haproxy_check_config_with_role_recommendations | bool
+
+- name: Generate the global file
+  ansible.builtin.template:
+    mode: "0640"
+    src: global.cfg.j2
+    dest: "{{ haproxy_fragments_folder | dirname }}/001_global.cfg"
+  when: haproxy_globals_merged.keys() | length > 0
+  #notify:
+  #  - restart haproxy
+
+- name: Record the expected files
+  ansible.builtin.set_fact:
+    haproxy_fragments: |-
+      {% set fragments = [] %}
+      {% set _ = fragments.extend(_copied_user_fragments.results | map(attribute='dest') | list) %}
+      {% if haproxy_globals_merged.keys() | length > 0 %}
+        {% set _ = fragments.append(haproxy_fragments_folder | dirname ~ '/001_global.cfg') %}
+      {% endif %}
+      {{ fragments }}
+
+- name: Show the expected fragment files
+  ansible.builtin.debug:
+    verbosity: 1
+    var: haproxy_fragments
+
+- name: Find fragment files present in cache
+  ansible.builtin.find:
+    path: "{{ haproxy_fragments_folder }}"
+  register: _files_in_fragments_folder
+
+- name: Cleanup cache
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop: "{{ _files_in_fragments_folder.files | map(attribute='path') | list | sort | difference(haproxy_fragments) }}"

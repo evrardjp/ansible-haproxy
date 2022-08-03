@@ -55,7 +55,15 @@
     - haproxy-sysctl
     - haproxy-install
 
-- ansible.builtin.import_tasks: haproxy_config.yml
+- name: Generate local HAProxy config
+  ansible.builtin.import_tasks: haproxy_localconfig_generation.yml
+  delegate_to: localhost
+  run_once: true
+  tags:
+    - haproxy-config
+
+- name: Apply config into HAProxy servers
+  ansible.builtin.import_tasks: haproxy_config.yml
   tags:
     - haproxy-config
 

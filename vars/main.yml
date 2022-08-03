@@ -21,6 +21,11 @@ haproxy_sysctls:
     value: "1"
     when: "{{ haproxy_bind_on_non_local_ipv6 | default(haproxy_bind_on_non_local) | bool }}"
 
+haproxy_globals_osdefaults: {}
+haproxy_globals_roledefaults: {}
+
+haproxy_check_config_with_role_recommendations: true
+
 haproxy_supported_keywords:
   global:
     # Process management and security
