@@ -103,7 +103,9 @@ This role:
   This merge behaviour is defined in the role default variable: ```haproxy_globals_merged```.
   Override it as ``haproxy_globals_merged: "{{ haproxy_globals }}"`` to ignore the OS/role recommendations.
 
-* Same behaviour happens for ```haproxy_defaults{,_osdefaults,_roledefaults,_merged}```
+* Same behaviour happens for ```haproxy_defaults{,_osdefaults,_roledefaults,_merged}```.
+  Please note that it is possible to have multiple default sections. This only applies for the last unnamed "default" section
+  from the assembled fragments.
 
 * HAProxy proxies are split in variables based on their top level configuration items:
   * ```haproxy_frontends```
@@ -123,7 +125,8 @@ Here are a few variables linked to fragment handling:
 
 * As HAProxy order configuration matters, fragments filename will be defined by default as the following:
   * 001_global for globals
-  * 002_default for defaults
+  * 002_default for unnamed defaults
+  * 002_default_<name> for named defaults
   * 003_listen_<name> for listens
   * 004_frontend_<name> for frontends
   * 005_backend_<name> for backends
@@ -160,9 +163,16 @@ Here are a few variables linked to fragment handling:
 
   Side notes about user fragments:
   * They are not validated by this role configuration, only validated by haproxy
-  * haproxy doesn't allow two "global" or two "default" definitions. To have a user fragment for those
-    sections, make sure to override the role generation by adding the setting the following variables.
-    ``haproxy_globals_merged: {}`` (for global) and/or ``haproxy_defaults_merged: {}`` for defaults.
+  * haproxy doesn't allow two "global" sections.
+    To have a user fragment for those sections, make sure to override the role generation of globals
+    by overriding ``haproxy_globals_merged`` as follow:  ``haproxy_globals_merged: {}``
+  * haproxy allows multiple defaults, including multiple unnamed ones. The last one before any configuration
+    will be applied. This is NOT SUPPPORTED BY THIS ROLE.
+    This role choses to work in an explicit manner, rather than purely implicit. As
+    the order of the defaults is always on before the proxies, it is impossible to have two unnamed defaults
+    for a specific proxy. To fix this, be explicit in your defaults by naming them. If you still want to
+    avoid the role provided unnamed defaults, make sure to override the role generation of unnamed defaults
+    by overriding the variable ``haproxy_defaults_merged`` as follow:  ``haproxy_defaults_merged: {}``.
 
 * A default variable, named ``haproxy_fragments``, will list the fragments to assemble together.
   This list will be by default populated as following:
