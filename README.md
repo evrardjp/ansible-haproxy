@@ -57,6 +57,35 @@ This role will:
 
 * When ```haproxy_bind_on_non_local``` is set to True, the role will change
   the HAProxy host sysctls to allow HAProxy to bind on non-local ips.
+  It is possible to override it per address family (IPv4/IPv6) too.
+
+* ```haproxy_packages``` is the list of packages that will be installed on
+  the deployed system. By default, only HAProxy is installed.
+  Extra packages might be useful to manage HAProxy, for example ``nc``,
+  ``socat``, ``hatop``, or ``haproxyctl``.
+
+  To install additional packages, set ``haproxy_extrapackages`` like this:
+  ```
+  haproxy_extrapackages:
+    - "nc"
+  ```
+  This will install nc on top of haproxy.
+
+  Note: We already provide a convenience variable named ``_haproxy_extrapackages``
+  containing ``hatop`` and ``socat``. To install them, set
+  ``` haproxy_role_extrapackages: true ```.
+  This will automatically add socat and hatop to the packages to install on
+  haproxy nodes.
+
+* ``haproxy_packages_state`` clarifies the intent behind the package installation.
+  By default it is only intended to have HAProxy installed. It is possible to ensure
+  always the latest version of the package is installed by setting:
+  ``haproxy_packages_state: "latest"``
+
+* Distribution specific variables (for example package names, paths to binaries,
+  binary names, service names) are stored in vars/ folder (one file per distro).
+  If this doesn't work for a case, please submit a PR.
+
 
 * ```haproxy_globals```: This is an optional dict containing HAProxy's
   "global" configuration directive. This will be merged with:
@@ -170,17 +199,28 @@ per distro).
 ## Other ansible default variables
 
 * ```haproxy_packages``` is the list of packages that will be installed on
-  the deployed system. By default, socat hatop and haproxy are installed
-  on Ubuntu. The first two are useful for managing haproxy. You can override
-  this list with your own packages.
-  To extend the list, can define in your vars:
-  ``haproxy_packages: "{{ _haproxy_packages + [ "myextrapackage" ] }}"``
+  the deployed system. By default, onlu HAProxy is installed.
+  Extra packages might be useful to manage HAProxy, for example socat, hatop,
+  or haproxyctl.
 
-* ```haproxy_server_repo``` is the repo url used for installing a recent haproxy
-  with packages.
+  To have install those packages, override ``haproxy_packages`` like this:
+  ```
+  haproxy_extrapackages:
+    - "nc"
+  haproxy_packages: "{{ _haproxy_packages + haproxy_extrapackages }}"
+  ```
 
-* ```haproxy_server_configuration_folder``` is a variable holding the path
-  to the haproxy configuration.
+  Notes:
+  * You are not forced to use an extra variable, you can simply concat
+    with "+". This extra variable is only used in docs for readability.
+  * We already provide a convenience variable named ``_haproxy_extrapackages``
+    containing hatop and socat. Add it to your ``haproxy_packages`` if you
+    want hatop and socat installed.
+
+* ``haproxy_packages_state`` clarifies the intent behind the package installation.
+  By default it is only intended to have HAProxy installed. It is possible to ensure
+  always the latest version of the package is installed by setting:
+  ``haproxy_packages_state: "latest"``
 
 ## Dependencies
 

@@ -13,20 +13,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# TODO: Refactor
+_haproxy_packages:
+  - haproxy
 
-- name: Add apt repo
-  apt_repository:
-    repo: "{{ haproxy_server_repo }}"
-    state: present
-    update_cache: yes
-  tags:
-    - haproxy-apt-repos
+_haproxy_extrapackages:
+  - socat
+  - hatop
 
-#- name: Drop haproxy repo pin
-#  template:
-#    src: "haproxy_pin.pref.j2"
-#    dest: "/etc/apt/preferences.d/haproxy_pin.pref"
-#    owner: "root"
-#    group: "root"
-#    mode: "0644"
+haproxy_apt_cache: 600
+
+#TODO: Refactor
+haproxy_server_configuration_folder: "/etc/haproxy"
+haproxy_service_name: haproxy
+haproxy_server_repo: "ppa:vbernat/haproxy-1.5"

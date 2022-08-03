@@ -13,3 +13,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+haproxy_packages: "{{ _haproxy_packages + (haproxy_extrapackages | default([])) + (haproxy_role_extrapackages | default(false) | bool | ternary(_haproxy_extrapackages,[])) }}"
+haproxy_packages_state: "present"

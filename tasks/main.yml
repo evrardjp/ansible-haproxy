@@ -13,30 +13,40 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+- name: Gather variables for each operating system
+  ansible.builtin.include_vars: "{{ lookup('first_found', params) }}"
+  vars:
+    params:
+      files:
+        - "{{ ansible_facts['distribution'] | lower }}-{{ ansible_facts['distribution_version'] | lower }}.yml"
+        - "{{ ansible_facts['distribution'] | lower }}-{{ ansible_facts['distribution_major_version'] | lower }}.yml"
+        - "{{ ansible_facts['os_family'] | lower }}-{{ ansible_facts['distribution_major_version'] | lower }}.yml"
+        - "{{ ansible_facts['distribution'] | lower }}.yml"
+        - "{{ ansible_facts['os_family'] | lower }}-{{ ansible_facts['distribution_version'].split('.')[0] }}.yml"
+        - "{{ ansible_facts['os_family'] | lower }}.yml"
+      paths:
+        - "{{ role_path }}/vars"
+  tags:
+    - always
+
+- name: install haproxy package(s)
+  ansible.builtin.package:
+    name: "{{ haproxy_packages }}"
+    state: "{{ haproxy_packages_state }}"
+    update_cache: true
+    cache_valid_time: "{{ haproxy_apt_cache | default(omit) }}"
+  notify:
+    - restart haproxy
+  tags:
+    - haproxy-packages
+    - haproxy-install
+
 #TODO: Refactor
-#- include_vars: "{{ item }}"
-#  with_first_found:
-#   - "{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml"
-#   - "{{ ansible_distribution }}.yml"
-#   - "{{ ansible_os_family }}.yml"
-#   - "default.yml"
-#
-#- include: haproxy_pre_install.yml
-#  when: haproxy_pre_install | bool
-#  tags:
-#    - haproxy-pre-install
-#
-#- include: haproxy_install.yml
-#  when: haproxy_install | bool
-#  tags:
-#    - haproxy-install
-#
 #- include: haproxy_post_install.yml
 #  when: haproxy_post_install | bool
 #  tags:
 #    - haproxy-post-install
 #
 #- include: haproxy_config.yml
-#  when: haproxy_config | bool
 #  tags:
 #    - haproxy-config
