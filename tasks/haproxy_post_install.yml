@@ -13,11 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# TODO: Refactor
-- include: haproxy_ssl.yml
-  when: haproxy_ssl | bool
-  tags:
-    - haproxy-ssl
 
 - name: Make haproxy bindable on non local addresses
   sysctl:
