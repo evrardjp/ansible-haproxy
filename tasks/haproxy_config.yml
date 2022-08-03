@@ -40,6 +40,17 @@
   delegate_to: localhost
   run_once: true
 
+- name: Find all fragment files
+  ansible.builtin.find:
+    path: "{{ haproxy_fragments_folder }}"
+  register: _files_in_fragments_folder
+
+- name: Cleanup cache
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop: "{{ _files_in_fragments_folder.files | map(attribute='path') | list | sort | difference(haproxy_fragments) }}"
+
 ## TODO: Refactor
 #- name: Cleaning up the fragments folder
 #  file:

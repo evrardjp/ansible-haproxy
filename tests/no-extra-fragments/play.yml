@@ -1,0 +1,43 @@
+---
+- hosts: localhost,
+  connection: local
+  vars:
+    haproxy_fragments_folder: "{{ playbook_dir }}/fragments/"
+    haproxy_globals_merged: {}
+    haproxy_defaults_merged: {}
+    expected_filenames:
+      - "{{ haproxy_fragments_folder | dirname }}/000_user_0.cfg"
+      - "{{ haproxy_fragments_folder | dirname }}/000_user_1.cfg"
+    haproxy_user_fragments:
+      - src: "{{ playbook_dir }}/my_user_fragment"
+      - content: |
+          listen awesome
+  tasks:
+    - name: Create a temp folder for fragments
+      ansible.builtin.file:
+        state: directory
+        path: "{{ haproxy_fragments_folder }}"
+
+    - name: Create an undesirable fragment in the fragment destination folder
+      ansible.builtin.copy:
+        content: "UNDESIRABLE FILE"
+        dest: "{{ haproxy_fragments_folder | dirname }}/undesirable.cfg"
+
+    - name: Deploy HAProxy
+      ansible.builtin.import_role:
+        name: "{{ playbook_dir }}/../../../ansible-haproxy"
+
+    - name: Find created fragment files
+      ansible.builtin.find:
+        path: "{{ haproxy_fragments_folder }}"
+      register: _files_in_fragments_folder
+
+    - name: Check that only two files were created
+      ansible.builtin.assert:
+        that:
+          - _files_in_fragments_folder.matched == (expected_filenames | length)
+
+    - name: Check that all files match our expectations of filename
+      ansible.builtin.assert:
+        that:
+          - (_files_in_fragments_folder.files | map(attribute='path') | list | sort) == expected_filenames
