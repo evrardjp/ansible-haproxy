@@ -20,3 +20,848 @@ haproxy_sysctls:
   - key: "net.ipv6.ip_nonlocal_bind"
     value: "1"
     when: "{{ haproxy_bind_on_non_local_ipv6 | default(haproxy_bind_on_non_local) | bool }}"
+
+haproxy_supported_keywords:
+  global:
+    # Process management and security
+    - ca-base
+    - chroot
+    - cluster-secret
+    - crt-base
+    - cpu-map
+    - daemon
+    - default-path
+    - description
+    - deviceatlas-json-file
+    - deviceatlas-log-level
+    - deviceatlas-separator
+    - deviceatlas-properties-cookie
+    - expose-experimental-directives
+    - external-check
+    - fd-hard-limit
+    - gid
+    - grace
+    - group
+    - hard-stop-after
+    - httpclient.resolvers.id
+    - httpclient.resolvers.prefer
+    - httpclient.ssl.ca-file
+    - httpclient.ssl.verify
+    - h1-accept-payload-with-any-method
+    - h1-case-adjust
+    - h1-case-adjust-file
+    - insecure-fork-wanted
+    - insecure-setuid-wanted
+    - issuers-chain-path
+    - h2-workaround-bogus-websocket-clients
+    - localpeer
+    - log
+    - log-tag
+    - log-send-hostname
+    - lua-load
+    - lua-load-per-thread
+    - lua-prepend-path
+    - mworker-max-reloads
+    - nbthread
+    - node
+    - numa-cpu-mapping
+    - pidfile
+    - pp2-never-send-local
+    - presetenv
+    - resetenv
+    - uid
+    - ulimit-n
+    - user
+    - set-dumpable
+    - set-var
+    - setenv
+    - stats
+    - ssl-default-bind-ciphers
+    - ssl-default-bind-ciphersuites
+    - ssl-default-bind-curves
+    - ssl-default-bind-options
+    - ssl-default-server-ciphers
+    - ssl-default-server-ciphersuites
+    - ssl-default-server-options
+    - ssl-dh-param-file
+    - ssl-propquery
+    - ssl-provider
+    - ssl-provider-path
+    - ssl-server-verify
+    - ssl-skip-self-issued-ca
+    - unix-bind
+    - unsetenv
+    - 51degrees-data-file
+    - 51degrees-property-name-list
+    - 51degrees-property-separator
+    - 51degrees-cache-size
+    - wurfl-data-file
+    - wurfl-information-list
+    - wurfl-information-list-separator
+    - wurfl-cache-size
+    - strict-limits
+
+    # Performance tuning
+    - busy-polling
+    - max-spread-checks
+    - maxconn
+    - maxconnrate
+    - maxcomprate
+    - maxcompcpuusage
+    - maxpipes
+    - maxsessrate
+    - maxsslconn
+    - maxsslrate
+    - maxzlibmem
+    - no-memory-trimming
+    - noepoll
+    - nokqueue
+    - noevports
+    - nopoll
+    - nosplice
+    - nogetaddrinfo
+    - noreuseport
+    - profiling.tasks
+    - spread-checks
+    - server-state-base
+    - server-state-file
+    - ssl-engine
+    - ssl-mode-async
+    - tune.buffers.limit
+    - tune.buffers.reserve
+    - tune.bufsize
+    - tune.comp.maxlevel
+    - tune.fd.edge-triggered
+    - tune.h2.header-table-size
+    - tune.h2.initial-window-size
+    - tune.h2.max-concurrent-streams
+    - tune.http.cookielen
+    - tune.http.logurilen
+    - tune.http.maxhdr
+    - tune.idle-pool.shared
+    - tune.idletimer
+    - tune.lua.forced-yield
+    - tune.lua.maxmem
+    - tune.lua.session-timeout
+    - tune.lua.task-timeout
+    - tune.lua.service-timeout
+    - tune.maxaccept
+    - tune.maxpollevents
+    - tune.maxrewrite
+    - tune.pattern.cache-size
+    - tune.pipesize
+    - tune.pool-high-fd-ratio
+    - tune.pool-low-fd-ratio
+    - tune.quic.frontend.conn-tx-buffers.limit
+    - tune.quic.frontend.max-idle-timeout
+    - tune.quic.frontend.max-streams-bidi
+    - tune.quic.retry-threshold
+    - tune.rcvbuf.client
+    - tune.rcvbuf.server
+    - tune.recv_enough
+    - tune.runqueue-depth
+    - tune.sched.low-latency
+    - tune.sndbuf.client
+    - tune.sndbuf.server
+    - tune.ssl.cachesize
+    - tune.ssl.force-private-cache
+    - tune.ssl.hard-maxrecord
+    - tune.ssl.keylog
+    - tune.ssl.lifetime
+    - tune.ssl.maxrecord
+    - tune.ssl.default-dh-param
+    - tune.ssl.ssl-ctx-cache-size
+    - tune.ssl.capture-buffer-size
+    - tune.ssl.capture-cipherlist-size (deprecated)
+    - tune.vars.global-max-size
+    - tune.vars.proc-max-size
+    - tune.vars.reqres-max-size
+    - tune.vars.sess-max-size
+    - tune.vars.txn-max-size
+    - tune.zlib.memlevel
+    - tune.zlib.windowsize
+
+    # Debugging
+    - quiet
+    - zero-warning
+
+  default:
+    - backlog
+    - balance
+    - bind-process
+    - clitcpka-cnt
+    - clitcpka-idle
+    - clitcpka-intvl
+    - compression
+    - cookie
+    - default-server
+    - default_backend
+    - disabled
+    - email-alert from
+    - email-alert level
+    - email-alert mailers
+    - email-alert myhostname
+    - email-alert to
+    - enabled
+    - errorfile
+    - errorfiles
+    - errorloc
+    - errorloc302
+    - errorloc303
+    - error-log-format
+    - fullconn
+    - hash-type
+    - http-check comment
+    - http-check connect
+    - http-check disable-on-404
+    - http-check expect
+    - http-check send
+    - http-check send-state
+    - http-check set-var
+    - http-check unset-var
+    - http-error
+    - http-reuse
+    - load-server-state-from-file
+    - no log
+    - log
+    - log-format
+    - log-format-sd
+    - log-tag
+    - max-keep-alive-queue
+    - maxconn
+    - mode
+    - monitor-uri
+    - option abortonclose
+    - no option abortonclose
+    - option accept-invalid-http-response
+    - no option accept-invalid-http-response
+    - option allbackups
+    - no option allbackups
+    - option checkcache
+    - no option checkcache
+    - option clitcpka
+    - no option clitcpka
+    - option contstats
+    - no option contstats
+    - option disable-h2-upgrade
+    - no option disable-h2-upgrade
+    - option dontlog-normal
+    - no option dontlog-normal
+    - option dontlognull
+    - no option dontlognull
+    - option forwardfor
+    - option h1-case-adjust-bogus-client
+    - no option h1-case-adjust-bogus-client
+    - option h1-case-adjust-bogus-server
+    - no option h1-case-adjust-bogus-server
+    - option http-buffer-request
+    - no option http-buffer-request
+    - option http-ignore-probes
+    - no option http-ignore-probes
+    - option http-keep-alive
+    - no option http-keep-alive
+    - option http-no-delay
+    - no option http-no-delay
+    - option http-pretend-keepalive
+    - no option http-pretend-keepalive
+    - option http-restrict-req-hdr-names
+    - option http-server-close
+    - option http-use-proxy-header
+    - no option http-use-proxy-header
+    - option httpchk
+    - option httpclose
+    - no option httpclose
+    - option httplog
+    - option httpslog
+    - option independent-streams
+    - no option independent-streams
+    - option ldap-check
+    - option external-check
+    - option log-health-checks
+    - no option log-health-checks
+    - option log-separate-errors
+    - no option log-separate-errors
+    - option logasap
+    - no option logasap
+    - option mysql-check
+    - option nolinger
+    - no option nolinger
+    - option originalto
+    - option persist
+    - no option persist
+    - option pgsql-check
+    - option prefer-last-server
+    - no option prefer-last-server
+    - option redispatch
+    - no option redispatch
+    - option redis-check
+    - option smtpchk
+    - option socket-stats
+    - no option socket-stats
+    - option splice-auto
+    - no option splice-auto
+    - option splice-request
+    - no option splice-request
+    - option splice-response
+    - no option splice-response
+    - option srvtcpka
+    - option ssl-hello-chk
+    - option tcp-check
+    - option tcp-smart-accept
+    - no option tcp-smart-accept
+    - option tcp-smart-connect
+    - no option tcp-smart-connect
+    - option tcpka
+    - option tcplog
+    - option transparent
+    - no option transparent
+    - option idle-close-on-response
+    - no option idle-close-on-response
+    - external-check command
+    - external-check path
+    - persist rdp-cookie
+    - rate-limit sessions
+    - retries
+    - retry-on
+    - server-state-file-name
+    - source
+    - srvtcpka-cnt
+    - srvtcpka-idle
+    - srvtcpka-intvl
+    - stats auth
+    - stats enable
+    - stats hide-version
+    - stats realm
+    - stats refresh
+    - stats scope
+    - stats show-desc
+    - stats show-legends
+    - stats show-node
+    - status uri
+    - tcp-check comment
+    - tcp-check connect
+    - tcp-check expect
+    - tcp-check send
+    - tcp-check send-lf
+    - tcp-check send-binary
+    - tcp-check send-binary-lf
+    - tcp-check set-var
+    - tcp-check unset-var
+    - timeout check
+    - timeout client
+    - timeout client-fin
+    - timeout connect
+    - timeout http-keep-alive
+    - timeout http-request
+    - timeout queue
+    - timeout server
+    - timeout server-fin
+    - timeout tarpit
+    - timeout tunnel
+    - transparent
+    - unique-id-format
+    - unique-id-header
+  frontend:
+    - acl
+    - backlog
+    - bind
+    - bind-process
+    - capture cookie
+    - capture request header
+    - capture response header
+    - clitcpka-cnt
+    - clitcpka-idle
+    - clitcpka-intvl
+    - compression
+    - declare capture
+    - default_backend
+    - description
+    - disabled
+    - email-alert from
+    - email-alert level
+    - email-alert mailers
+    - email-alert myhostname
+    - email-alert to
+    - enabled
+    - errorfile
+    - errorfiles
+    - errorloc
+    - errorloc302
+    - errorloc303
+    - error-log-format
+    - filter
+    - http-after-response
+    - http-error
+    - http-request
+    - http-response
+    - id
+    - log
+    - no log
+    - log-format
+    - log-format-sd
+    - log-tag
+    - maxconn
+    - mode
+    - monitor fail
+    - monitor-uri
+    - option accept-invalid-http-request
+    - no option accept-invalid-http-request
+    - option clitcpka
+    - no option clitcpka
+    - option contstats
+    - no option contstats
+    - option disable-h2-upgrade
+    - no option disable-h2-upgrade
+    - option dontlog-normal
+    - no option dontlog-normal
+    - option dontlognull
+    - no option dontlognull
+    - option forwardfor
+    - option h1-case-adjust-bogus-client
+    - no option h1-case-adjust-bogus-client
+    - option http-buffer-request
+    - no option http-buffer-request
+    - option http-ignore-probes
+    - no option http-ignore-probes
+    - option http-keep-alive
+    - no option http-keep-alive
+    - option http-no-delay
+    - no option http-no-delay
+    - option http-restrict-req-hdr-names
+    - option http-server-close
+    - no option http-server-close
+    - option http-use-proxy-header
+    - no option http-use-proxy-header
+    - option httpclose
+    - no option httpclose
+    - option httplog
+    - option httpslog
+    - option independent-streams
+    - no option independent-streams
+    - option log-separate-errors
+    - no option log-separate-errors
+    - option logasap
+    - no option logasap
+    - option nolinger
+    - no option nolinger
+    - option originalto
+    - option socket-stats
+    - no option socket-stats
+    - option splice-auto
+    - no option splice-auto
+    - option splice-request
+    - no option splice-request
+    - option splice-response
+    - no option splice-response
+    - option tcp-smart-accept
+    - no option tcp-smart-accept
+    - option tcpka
+    - option tcplog
+    - option idle-close-on-response
+    - no option idle-close-on-response
+    - rate-limit sessions
+    - redirect
+    - stats admin
+    - stats auth
+    - stats enable
+    - stats hide-version
+    - stats http-request
+    - stats realm
+    - stats refresh
+    - stats scope
+    - stats show-desc
+    - stats show-legends
+    - stats show-node
+    - stats uri
+    - stick-table
+    - tcp-request connection
+    - tcp-request content
+    - tcp-request inspect-delay
+    - tcp-request session
+    - timeout client
+    - timeout client-fin
+    - timeout http-keep-alive
+    - timeout http-request
+    - timeout tarpit
+    - unique-id-format
+    - unique-id-header
+    - use_backend
+  listen:
+    - acl
+    - backlog
+    - balance
+    - bind
+    - bind-process
+    - capture cookie
+    - capture request header
+    - capture response header
+    - clitcpka-cnt
+    - clitcpka-idle
+    - clitcpka-intvl
+    - compression
+    - cookie
+    - declare capture
+    - default-server
+    - default_backend
+    - description
+    - disabled
+    - dispatch
+    - email-alert from
+    - email-alert level
+    - email-alert mailers
+    - email-alert myhostname
+    - email-alert to
+    - enabled
+    - errorfile
+    - errorfiles
+    - errorloc
+    - errorloc302
+    - errorloc303
+    - error-log-format
+    - force-persist
+    - filter
+    - fullconn
+    - hash-type
+    - http-after-response
+    - http-check comment
+    - http-check connect
+    - http-check disable-on-404
+    - http-check expect
+    - http-check send
+    - http-check send-state
+    - http-check set-var
+    - http-check unset-var
+    - http-error
+    - http-request
+    - http-response
+    - http-reuse
+    - http-send-name-header
+    - id
+    - ignore-persist
+    - load-server-state-from-file
+    - log
+    - no log
+    - log-format
+    - log-format-sd
+    - log-tag
+    - max-keep-alive-queue
+    - maxconn
+    - mode
+    - monitor fail
+    - monitor-uri
+    - option abortonclose
+    - no option abortonclose
+    - option accept-invalid-http-request
+    - no option accept-invalid-http-request
+    - option accept-invalid-http-response
+    - no option accept-invalid-http-response
+    - option allbackups
+    - no option allbackups
+    - option checkcache
+    - no option checkcache
+    - option clitcpka
+    - no option clitcpka
+    - option contstats
+    - no option contstats
+    - option disable-h2-upgrade
+    - no option disable-h2-upgrade
+    - option dontlog-normal
+    - no option dontlog-normal
+    - option dontlognull
+    - no option dontlognull
+    - option forwardfor
+    - option h1-case-adjust-bogus-client
+    - no option h1-case-adjust-bogus-client
+    - option h1-case-adjust-bogus-server
+    - no option h1-case-adjust-bogus-server
+    - option http-buffer-request
+    - no option http-buffer-request
+    - option http-ignore-probes
+    - no option http-ignore-probes
+    - option http-keep-alive
+    - no option http-keep-alive
+    - option http-no-delay
+    - no option http-no-delay
+    - option http-pretend-keepalive
+    - no option http-pretend-keepalive
+    - option http-restrict-req-hdr-names
+    - option http-server-close
+    - no option http-server-close
+    - option http-use-proxy-header
+    - no option http-use-proxy-header
+    - option httpchk
+    - option httpclose
+    - no option httpclose
+    - option httplog
+    - option httpslog
+    - option independent-streams
+    - no option independent-streams
+    - option ldap-check
+    - option external-check
+    - option log-health-checks
+    - no option log-health-checks
+    - option log-separate-errors
+    - no option log-separate-errors
+    - option logasap
+    - no option logasap
+    - option mysql-check
+    - option nolinger
+    - no option nolinger
+    - option originalto
+    - option persist
+    - no option persist
+    - option pgsql-check
+    - option prefer-last-server
+    - no option prefer-last-server
+    - option redispatch
+    - no option redispatch
+    - option redis-check
+    - option smtpchk
+    - option socket-stats
+    - no option socket-stats
+    - option splice-auto
+    - no option splice-auto
+    - option splice-request
+    - no option splice-request
+    - option splice-response
+    - no option splice-response
+    - option srvtcpka
+    - no option srvtcpka
+    - option ssl-hello-chk
+    - option tcp-check
+    - option tcp-smart-accept
+    - no option tcp-smart-accept
+    - option tcp-smart-connect
+    - no option tcp-smart-connect
+    - option tcpka
+    - option tcplog
+    - option transparent
+    - no option transparent
+    - option idle-close-on-response
+    - no option idle-close-on-response
+    - external-check command
+    - external-check path
+    - persist rdp-cookie
+    - rate-limit sessions
+    - redirect
+    - retries
+    - retry-on
+    - server
+    - server-state-file-name
+    - server-template
+    - source
+    - srvtcpka-cnt
+    - srvtcpka-idle
+    - srvtcpka-intvl
+    - stats admin
+    - stats auth
+    - stats enable
+    - stats hide-version
+    - stats http-request
+    - stats realm
+    - stats refresh
+    - stats scope
+    - stats show-desc
+    - stats show-legends
+    - stats show-node
+    - stats uri
+    - stick match
+    - stick on
+    - stick store-request
+    - stick store-response
+    - stick-table
+    - tcp-check comment
+    - tcp-check connect
+    - tcp-check expect
+    - tcp-check send
+    - tcp-check send-lf
+    - tcp-check send-binary
+    - tcp-check send-binary-lf
+    - tcp-check set-var
+    - tcp-check unset-var
+    - tcp-request connection
+    - tcp-request content
+    - tcp-request inspect-delay
+    - tcp-request session
+    - tcp-response content
+    - tcp-response inspect-delay
+    - timeout check
+    - timeout client
+    - timeout client-fin
+    - timeout connect
+    - timeout http-keep-alive
+    - timeout http-request
+    - timeout queue
+    - timeout server
+    - timeout server-fin
+    - timeout tarpit
+    - timeout tunnel
+    - transparent
+    - unique-id-format
+    - unique-id-header
+    - use_backend
+    - use-fcgi-app
+    - use-server
+  backend:
+    - acl
+    - balance
+    - bind-process
+    - compression
+    - cookie
+    - default-server
+    - description
+    - disabled
+    - dispatch
+    - email-alert from
+    - email-alert level
+    - email-alert mailers
+    - email-alert myhostname
+    - email-alert to
+    - enabled
+    - errorfile
+    - errorfiles
+    - errorloc
+    - errorloc302
+    - errorloc303
+    - force-persist
+    - filter
+    - fullconn
+    - hash-type
+    - http-after-response
+    - http-check comment
+    - http-check connect
+    - http-check disable-on-404
+    - http-check expect
+    - http-check send
+    - http-check send-state
+    - http-check set-var
+    - http-check unset-var
+    - http-error
+    - http-request
+    - http-response
+    - http-reuse
+    - http-send-name-header
+    - id
+    - ignore-persist
+    - load-server-state-from-file
+    - log
+    - no log
+    - log-tag
+    - max-keep-alive-queue
+    - mode
+    - option abortonclose
+    - no option abortonclose
+    - option accept-invalid-http-response
+    - no option accept-invalid-http-response
+    - option allbackups
+    - no option allbackups
+    - option checkcache
+    - no option checkcache
+    - option forwardfor
+    - option h1-case-adjust-bogus-server
+    - no option h1-case-adjust-bogus-server
+    - option http-buffer-request
+    - no option http-buffer-request
+    - option http-keep-alive
+    - no option http-keep-alive
+    - option http-no-delay
+    - no option http-no-delay
+    - option http-pretend-keepalive
+    - no option http-pretend-keepalive
+    - option http-restrict-req-hdr-names
+    - option http-server-close
+    - no option http-server-close
+    - option httpchk
+    - option httpclose
+    - no option httpclose
+    - option independent-streams
+    - no option independent-streams
+    - option ldap-check
+    - option external-check
+    - option log-health-checks
+    - no option log-health-checks
+    - option mysql-check
+    - option nolinger
+    - no option nolinger
+    - option originalto
+    - option persist
+    - no option persist
+    - option pgsql-check
+    - option prefer-last-server
+    - no option prefer-last-server
+    - option redispatch
+    - no option redispatch
+    - option redis-check
+    - option smtpchk
+    - option splice-auto
+    - no option splice-auto
+    - option splice-request
+    - no option splice-request
+    - option splice-response
+    - no option splice-response
+    - option spop-check
+    - option srvtcpka
+    - no option srvtcpka
+    - option ssl-hello-chk
+    - option tcp-check
+    - option tcp-smart-connect
+    - no option tcp-smart-connect
+    - option tcpka
+    - option tcplog
+    - option transparent
+    - no option transparent
+    - external-check command
+    - external-check path
+    - persist rdp-cookie
+    - redirect
+    - retries
+    - retry-on
+    - server
+    - server-state-file-name
+    - server-template
+    - source
+    - srvtcpka-cnt
+    - srvtcpka-idle
+    - srvtcpka-intvl
+    - stats admin
+    - stats auth
+    - stats enable
+    - stats hide-version
+    - stats http-request
+    - stats realm
+    - stats refresh
+    - stats scope
+    - stats show-desc
+    - stats show-legends
+    - stats show-node
+    - stats uri
+    - stick match
+    - stick on
+    - stick store-request
+    - stick store-response
+    - stick-table
+    - tcp-check comment
+    - tcp-check connect
+    - tcp-check expect
+    - tcp-check send
+    - tcp-check send-lf
+    - tcp-check send-binary
+    - tcp-check send-binary-lf
+    - tcp-check set-var
+    - tcp-check unset-var
+    - tcp-request content
+    - tcp-request inspect-delay
+    - tcp-response content
+    - tcp-response inspect-delay
+    - timeout check
+    - timeout connect
+    - timeout http-keep-alive
+    - timeout http-request
+    - timeout queue
+    - timeout server
+    - timeout server-fin
+    - timeout tarpit
+    - timeout tunnel
+    - transparent
+    - use-fcgi-app
+    - use-server
