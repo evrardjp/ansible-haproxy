@@ -15,3 +15,10 @@
 
 haproxy_packages: "{{ _haproxy_packages + (haproxy_extrapackages | default([])) + (haproxy_role_extrapackages | default(false) | bool | ternary(_haproxy_extrapackages,[])) }}"
 haproxy_packages_state: "present"
+
+# Set this to yes to that haproxy can bind on non local
+# for both ipv4 and ipv6.
+# This can be also overriden by IP family by setting
+# ``haproxy_bind_on_non_local_ipv4`` or
+# ``haproxy_bind_on_non_local_ipv6``
+haproxy_bind_on_non_local: false

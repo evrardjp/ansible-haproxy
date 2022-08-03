@@ -41,12 +41,20 @@
     - haproxy-packages
     - haproxy-install
 
-#TODO: Refactor
-#- include: haproxy_post_install.yml
-#  when: haproxy_post_install | bool
-#  tags:
-#    - haproxy-post-install
-#
+- name: Allow consuming apps to bind on non local addresses
+  ansible.posix.sysctl:
+    name: "{{ item.key }}"
+    value: "{{ item.value }}"
+    sysctl_set: true
+    state: present
+  when: item.when
+  loop: "{{ haproxy_sysctls }}"
+  notify:
+    - restart haproxy
+  tags:
+    - haproxy-sysctl
+    - haproxy-install
+
 #- include: haproxy_config.yml
 #  tags:
 #    - haproxy-config
