@@ -1,0 +1,6 @@
+defaults {% if default_name is defined %}{{ default_name }}{% endif %}
+
+{% for key, value in defaults.items() %}
+    {{ key }} {% if value is not none %}{{ value }}{% endif %}
+
+{% endfor %}

@@ -29,7 +29,12 @@ haproxy_user_fragments: []
 # Global
 ## User provided
 haproxy_globals: {}
+haproxy_defaults: {}
+haproxy_named_defaults: {}
+
+## Standard wirings
 haproxy_globals_merged: "{{ [ haproxy_globals_osdefaults, haproxy_globals_roledefaults, haproxy_globals ] | combine }}"
+haproxy_defaults_merged: "{{ [ haproxy_defaults_osdefaults, haproxy_defaults_roledefaults, haproxy_defaults ] | combine }}"
 
 # Fragments default location
 haproxy_fragments_folder: "/var/cache/ansible/haproxy-role/"

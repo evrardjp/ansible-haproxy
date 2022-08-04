@@ -19,6 +19,10 @@
     state: directory
     recurse: true
 
+########
+# User #
+########
+
 - name: Copying the user fragments
   ansible.builtin.copy:
     remote_src: false
@@ -30,6 +34,10 @@
   loop_control:
     index_var: index
   register: _copied_user_fragments
+
+##########
+# Global #
+##########
 
 - name: Sanity check on user input before generating the global fragment
   ansible.builtin.fail:
@@ -43,9 +51,59 @@
     mode: "0640"
     src: global.cfg.j2
     dest: "{{ haproxy_fragments_folder | dirname }}/001_global.cfg"
-  when: haproxy_globals_merged.keys() | length > 0
-  #notify:
-  #  - restart haproxy
+  when:
+    - haproxy_globals_merged.keys() | length > 0
+  notify:
+    - restart haproxy
+
+############
+# Defaults #
+############
+
+- name: Sanity check on user input before generating the anonymous defaults
+  ansible.builtin.fail:
+    msg: "Anonymous defaults cannot be generated, incorrect keyword requested"
+  when:
+    - haproxy_defaults_merged.keys() | list | difference(haproxy_supported_keywords['defaults'])
+    - haproxy_check_config_with_role_recommendations | bool
+
+- name: Sanity check on user input before generating the named defaults
+  ansible.builtin.fail:
+    msg: "Named defaults cannot be generated, incorrect keyword requested"
+  when:
+    - haproxy_named_defaults.values() | list | combine | list | difference(haproxy_supported_keywords['defaults'])
+    - haproxy_check_config_with_role_recommendations | bool
+
+- name: Generate the anonymous defaults fragment file
+  ansible.builtin.template:
+    src: defaults.cfg.j2
+    dest: "{{ haproxy_fragments_folder | dirname }}/002_defaults.cfg"
+    mode: "0640"
+  vars:
+    default_name:
+    defaults: "{{ haproxy_defaults_merged }}"
+  when:
+    - haproxy_defaults_merged.keys() | length > 0
+  notify:
+    - restart haproxy
+
+- name: Generate the named defaults fragment files
+  ansible.builtin.template:
+    src: defaults.cfg.j2
+    dest: "{{ haproxy_fragments_folder | dirname }}/002_defaults_{{ default_name }}.cfg"
+    mode: "0640"
+  vars:
+    default_name: "{{ item.key }}"
+    defaults: "{{ item.value }}"
+  loop: "{{ haproxy_named_defaults | dict2items() }}"
+  when:
+    - haproxy_named_defaults.keys() | length > 0
+  notify:
+    - restart haproxy
+
+##############################
+# Cleanup cache of fragments #
+##############################
 
 - name: Record the expected files
   ansible.builtin.set_fact:
@@ -55,6 +113,12 @@
       {% if haproxy_globals_merged.keys() | length > 0 %}
         {% set _ = fragments.append(haproxy_fragments_folder | dirname ~ '/001_global.cfg') %}
       {% endif %}
+      {% if haproxy_defaults_merged.keys() | length > 0 %}
+        {% set _ = fragments.append(haproxy_fragments_folder | dirname ~ '/002_defaults.cfg') %}
+      {% endif %}
+      {% for filename in haproxy_named_defaults.keys()  %}
+        {% set _ = fragments.append(haproxy_fragments_folder | dirname ~ '/002_defaults_' ~ filename ~ '.cfg') %}
+      {% endfor %}
       {{ fragments }}
 
 - name: Show the expected fragment files

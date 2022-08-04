@@ -23,6 +23,8 @@ haproxy_sysctls:
 
 haproxy_globals_osdefaults: {}
 haproxy_globals_roledefaults: {}
+haproxy_defaults_osdefaults: {}
+haproxy_defaults_roledefaults: {}
 
 haproxy_check_config_with_role_recommendations: true
 
@@ -190,7 +192,7 @@ haproxy_supported_keywords:
     - quiet
     - zero-warning
 
-  default:
+  defaults:
     - backlog
     - balance
     - bind-process
@@ -872,7 +874,7 @@ haproxy_supported_keywords:
     - use-server
 
 haproxy_recommended_keywords:
-  default:
+  defaults:
     - timeout client
     - timeout connect
     - timeout server

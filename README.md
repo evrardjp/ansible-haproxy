@@ -107,6 +107,8 @@ This role:
   Please note that it is possible to have multiple default sections. This only applies for the last unnamed "default" section
   from the assembled fragments.
 
+* HAProxy named defaults will be generated from ```haproxy_named_defaults```
+
 * HAProxy proxies are split in variables based on their top level configuration items:
   * ```haproxy_frontends```
   * ```haproxy_backends```
@@ -125,8 +127,8 @@ Here are a few variables linked to fragment handling:
 
 * As HAProxy order configuration matters, fragments filename will be defined by default as the following:
   * 001_global for globals
-  * 002_default for unnamed defaults
-  * 002_default_<name> for named defaults
+  * 002_defaults for unnamed defaults
+  * 002_defaults_<name> for named defaults
   * 003_listen_<name> for listens
   * 004_frontend_<name> for frontends
   * 005_backend_<name> for backends
@@ -177,7 +179,7 @@ Here are a few variables linked to fragment handling:
 * A default variable, named ``haproxy_fragments``, will list the fragments to assemble together.
   This list will be by default populated as following:
   * The path to the 001_global file (as explained above, this file is templated from `haproxy_globals_merged`)
-  * The path to the 002_default file (as explained above, this file is templated from `haproxy_defaults_merged`)
+  * The path to the 002_defaults file (as explained above, this file is templated from `haproxy_defaults_merged`)
   * The paths to each frontend/backend/listen/... fragments (as explained above, generated from)
     ``haproxy_{frontends,backends,listens}`` and from convenience variables.
   * The paths to each user fragment 000_user_*
