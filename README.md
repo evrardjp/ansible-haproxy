@@ -201,26 +201,6 @@ Here are some variables which will automatically create some frontend/backend/li
 
 TODO
 
-#HAProxy has an internal way of gathering statistics, and can show it to the
-#user/deployer. Here are variables altering the stats behaviour.
-#
-#* When ```haproxy_webstats``` is set to True, webstats will be enabled for
-#  haproxy. You'll have to define the IP/port webstats will bind on
-#  (with ```haproxy_webstats_bind```) and the authentication credentials
-#  (with ```haproxy_webstats_auth```)
-#* Still for the webstats, you can define ```haproxy_webstats_hide_version```,
-#  ```haproxy_webstats_uri``` and ```haproxy_webstats_realm```.
-#  The use of these variables should be self explanatory. You can still check
-#  on HAProxy upstream documentation, if needed.
-#* ```haproxy_localstats``` is a way to enable/disable local socket for
-#  managing haproxy. It can be used with hatop and/or socat. By default, the
-#  local stats socket is enabled, with admin mode. The level of the access
-#  can be modified by replacing 'level admin' with the level you need
-#  in the variable ```haproxy_localstats_level```.
-#* A variable ```haproxy_localstats_timeout``` exists if you want to
-#  define a timeout on the localstats socket. Cf. upstream documentation.
-
-
 ## Dependencies
 
 None
