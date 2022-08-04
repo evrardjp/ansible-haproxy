@@ -138,6 +138,43 @@
   notify:
     - restart haproxy
 
+############
+# Frontend #
+############
+
+- name: Sanity check on user input before generating the frontends
+  ansible.builtin.fail:
+    msg: "Frontend cannot be generated, incorrect keyword requested"
+  when:
+    - haproxy_frontends.values() | list | combine | list | difference(haproxy_supported_keywords['frontend'])
+    - haproxy_check_config_with_role_recommendations | bool
+
+- name: Check that frontends contain the recommended data
+  ansible.builtin.fail:
+    msg: "Frontend will be incomplete, please make sure to fill the following keyword(s): {{ haproxy_recommended_keywords['frontend'] | join(', ') }}"
+  register: frontend_recommendation_state
+  # This will allow to show as an error but continue.
+  ignore_errors: true
+  when:
+    - haproxy_frontends.keys() | length > 0
+    - haproxy_recommended_keywords['frontend'] | difference(haproxy_frontends.values() | list | combine | list) | length != 0
+    - haproxy_check_config_with_role_recommendations | bool
+
+- name: Generate the frontend fragment files
+  ansible.builtin.template:
+    src: generic.cfg.j2
+    dest: "{{ haproxy_fragments_folder | dirname }}/004_frontend_{{ name }}.cfg"
+    mode: "0640"
+  vars:
+    top_level_type: "frontend"
+    name: "{{ item.key }}"
+    content: "{{ item.value }}"
+  loop: "{{ haproxy_frontends | dict2items() }}"
+  when:
+    - haproxy_frontends.keys() | length > 0
+  notify:
+    - restart haproxy
+
 ##############################
 # Cleanup cache of fragments #
 ##############################
@@ -158,6 +195,9 @@
       {% endfor %}
       {% for filename in haproxy_listens.keys()  %}
         {% set _ = fragments.append(haproxy_fragments_folder | dirname ~ '/003_listen_' ~ filename ~ '.cfg') %}
+      {% endfor %}
+      {% for filename in haproxy_frontends.keys()  %}
+        {% set _ = fragments.append(haproxy_fragments_folder | dirname ~ '/004_frontend_' ~ filename ~ '.cfg') %}
       {% endfor %}
       {{ fragments }}
 
