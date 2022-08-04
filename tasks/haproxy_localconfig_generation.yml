@@ -175,6 +175,32 @@
   notify:
     - restart haproxy
 
+###########
+# Backend #
+###########
+
+- name: Sanity check on user input before generating the backends
+  ansible.builtin.fail:
+    msg: "Backend cannot be generated, incorrect keyword requested"
+  when:
+    - haproxy_backends.values() | list | combine | list | difference(haproxy_supported_keywords['backend'])
+    - haproxy_check_config_with_role_recommendations | bool
+
+- name: Generate the backend fragment files
+  ansible.builtin.template:
+    src: generic.cfg.j2
+    dest: "{{ haproxy_fragments_folder | dirname }}/005_backend_{{ name }}.cfg"
+    mode: "0640"
+  vars:
+    top_level_type: "backend"
+    name: "{{ item.key }}"
+    content: "{{ item.value }}"
+  loop: "{{ haproxy_backends | dict2items() }}"
+  when:
+    - haproxy_backends.keys() | length > 0
+  notify:
+    - restart haproxy
+
 ##############################
 # Cleanup cache of fragments #
 ##############################
@@ -198,6 +224,9 @@
       {% endfor %}
       {% for filename in haproxy_frontends.keys()  %}
         {% set _ = fragments.append(haproxy_fragments_folder | dirname ~ '/004_frontend_' ~ filename ~ '.cfg') %}
+      {% endfor %}
+      {% for filename in haproxy_backends.keys()  %}
+        {% set _ = fragments.append(haproxy_fragments_folder | dirname ~ '/005_backend_' ~ filename ~ '.cfg') %}
       {% endfor %}
       {{ fragments }}
 
