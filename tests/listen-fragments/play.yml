@@ -1,0 +1,84 @@
+---
+- name: Test fail safe from incorrect user input on listen
+  hosts: localhost
+  connection: local
+  vars:
+    haproxy_fragments_folder: "{{ playbook_dir }}/fragments/"
+    haproxy_listens:
+      test1:
+        invalidkey: "invalid"
+  tasks:
+    - name: Deploy and fail due to incorrect listen
+      block:
+        - name: Deploy HAProxy
+          ansible.builtin.import_role:
+            name: "{{ playbook_dir }}/../../../ansible-haproxy"
+      rescue:
+        - name: Debug the failure
+          ansible.builtin.fail:
+            msg: The role should have failed on generation due to invalidkey in listen
+          when:
+            - ansible_failed_task.name != "Sanity check on user input before generating the listens"
+
+- name: Warn when input does not follow recommendations
+  hosts: localhost
+  connection: local
+  vars:
+    haproxy_fragments_folder: "{{ playbook_dir }}/fragments/"
+    haproxy_listens:
+      test1:
+        balance: "first"
+  tasks:
+    - name: Deploy, fail, and ignore due to lack of bind in listen
+      block:
+        - name: Deploy HAProxy
+          ansible.builtin.import_role:
+            name: "{{ playbook_dir }}/../../../ansible-haproxy"
+      rescue:
+        - name: Show recommendation state
+          ansible.builtin.debug:
+            var: listen_recommendation_state
+
+        - name: In case failure was NOT detected
+          ansible.builtin.fail:
+            msg: "Warning was _not_ generated while not following recommendations"
+          when:
+            - not listen_recommendation_state.failed | bool
+            - haproxy_check_config_with_role_recommendations | bool
+
+- name: Deploy with listens
+  hosts: localhost
+  connection: local
+  vars:
+    haproxy_fragments_folder: "{{ playbook_dir }}/fragments/"
+    haproxy_listens:
+      test1:
+        bind: ":4444"
+  tasks:
+    - name: Deploy HAProxy
+      ansible.builtin.import_role:
+        name: "{{ playbook_dir }}/../../../ansible-haproxy"
+
+    - name: Find created files
+      ansible.builtin.find:
+        path: "{{ haproxy_fragments_folder }}"
+      register: _files_in_fragments_folder
+
+    - name: Set fragments folder content
+      ansible.builtin.set_fact:
+        _haproxy_fragments_folder_content: "{{ _files_in_fragments_folder.files | map(attribute='path') | list | sort }}"
+
+    - name: Show fragments folder content
+      ansible.builtin.debug:
+        var: _haproxy_fragments_folder_content
+        verbosity: 1
+
+    - name: Check that the listen fragments are present
+      ansible.builtin.assert:
+        that:
+          - "haproxy_fragments_folder ~ '003_listen_test1.cfg' in _haproxy_fragments_folder_content"
+
+    - name: Check that fragments' content matches expectations
+      ansible.builtin.assert:
+        that:
+          - "lookup('file', haproxy_fragments_folder ~ '003_listen_test1.cfg') | regex_search('bind.*4444') is not none"

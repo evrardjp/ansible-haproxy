@@ -31,6 +31,7 @@ haproxy_user_fragments: []
 haproxy_globals: {}
 haproxy_defaults: {}
 haproxy_named_defaults: {}
+haproxy_listens: {}
 
 ## Standard wirings
 haproxy_globals_merged: "{{ [ haproxy_globals_osdefaults, haproxy_globals_roledefaults, haproxy_globals ] | combine }}"

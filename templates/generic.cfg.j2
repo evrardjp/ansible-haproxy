@@ -1,0 +1,6 @@
+{{ top_level_type }} {{ name }}
+
+{% for key, value in content.items() %}
+    {{ key }} {% if value is not none %}{{ value }}{% endif %}
+
+{% endfor %}
