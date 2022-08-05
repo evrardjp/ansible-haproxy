@@ -14,3 +14,13 @@
 # limitations under the License.
 
 # Assemble and validate
+- name: Assemble fragments
+  ansible.builtin.assemble:
+    src: "{{ haproxy_fragments_folder }}"
+    dest: "{{ haproxy_server_configuration_folder | default('/etc/haproxy') }}/{{ haproxy_server_configuration_file | default('haproxy.cfg') }}"
+    mode: "0640"
+    remote_src: false
+    validate: haproxy -f %s -c
+  register: _assemble_haproxy_config
+  notify:
+    - restart haproxy
