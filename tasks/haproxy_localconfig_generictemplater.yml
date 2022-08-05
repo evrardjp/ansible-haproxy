@@ -1,0 +1,18 @@
+- name: Generate the fragment files for {{ top_level_type }}
+  ansible.builtin.template:
+    src: generic.cfg.j2
+    dest: "{{ haproxy_fragments_folder | dirname }}/006_{{ top_level_type }}_{{ name }}.cfg"
+    mode: "0640"
+  vars:
+    name: "{{ item.key }}"
+    content: "{{ item.value }}"
+  loop: "{{ haproxy_others[top_level_type] | dict2items() }}"
+  register: _generated_files
+  when:
+    - haproxy_others[top_level_type].keys() | length > 0
+  notify:
+    - restart haproxy
+
+- name: Extend the list of other fragment files
+  ansible.builtin.set_fact:
+    haproxy_others_fragments: "{{ haproxy_others_fragments | default([]) + (_generated_files.results | map(attribute='invocation') | map(attribute='module_args') | map(attribute='dest')) }}"

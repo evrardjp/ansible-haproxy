@@ -201,6 +201,22 @@
   notify:
     - restart haproxy
 
+##########
+# Others #
+##########
+
+- name: Generate other types of files
+  ansible.builtin.include_tasks: haproxy_localconfig_generictemplater.yml
+  loop: "{{ haproxy_others.keys() }}"
+  loop_control:
+    loop_var: top_level_type
+  when: haproxy_others.keys() | length > 0
+
+- name: Debug generated files
+  ansible.builtin.debug:
+    var: haproxy_others_fragments
+    verbosity: 1
+
 ##############################
 # Cleanup cache of fragments #
 ##############################
@@ -228,6 +244,9 @@
       {% for filename in haproxy_backends.keys()  %}
         {% set _ = fragments.append(haproxy_fragments_folder | dirname ~ '/005_backend_' ~ filename ~ '.cfg') %}
       {% endfor %}
+      {% if haproxy_others_fragments | length > 0 %}
+        {% set _ = fragments.extend(haproxy_others_fragments) %}
+      {% endif %}
       {{ fragments }}
 
 - name: Show the expected fragment files

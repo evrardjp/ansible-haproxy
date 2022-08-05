@@ -26,14 +26,14 @@ haproxy_bind_on_non_local: false
 # User fragments
 haproxy_user_fragments: []
 
-# Global
-## User provided
+# User data for templating
 haproxy_globals: {}
 haproxy_defaults: {}
 haproxy_named_defaults: {}
 haproxy_listens: {}
 haproxy_frontends: {}
 haproxy_backends: {}
+haproxy_others: {}
 
 ## Standard wirings
 haproxy_globals_merged: "{{ [ haproxy_globals_osdefaults, haproxy_globals_roledefaults, haproxy_globals ] | combine }}"

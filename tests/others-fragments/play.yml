@@ -1,0 +1,88 @@
+---
+- name: Incorrect cache should fail to deploy
+  hosts: localhost
+  connection: local
+  vars:
+    haproxy_fragments_folder: "{{ playbook_dir }}/fragments/"
+    haproxy_user_fragments:
+      - content: |
+          listen minimum_fragment_to_pass_haproxy_handler
+            bind :4444
+            timeout connect         10s
+            timeout client          1m
+            timeout server          1m
+    haproxy_others:
+      cache:
+        cache1:
+          max-age: 30
+  tasks:
+    - name: Run HAProxy role
+      block:
+        - name: Deploy HAProxy
+          ansible.builtin.import_role:
+            name: "{{ playbook_dir }}/../../../ansible-haproxy"
+
+      # We don't care if the rest of the execution succeeded or failed
+      # As long as we know the error worked
+      rescue:
+        - name: Be verbose about the failure
+          ansible.builtin.fail:
+            msg: "We did not fail where we should have failed due to incorrect config"
+          when:
+            - not _assemble_haproxy_config.failed | bool
+
+- name: Deploy with others
+  hosts: localhost
+  connection: local
+  vars:
+    haproxy_fragments_folder: "{{ playbook_dir }}/fragments/"
+    haproxy_user_fragments:
+      - content: |
+          listen minimum_fragment_to_pass_haproxy_handler
+            bind :4444
+            timeout connect         10s
+            timeout client          1m
+            timeout server          1m
+    haproxy_others:
+      userlist:
+        userlistname:
+          user: "joe insecure-password mypassword123"
+        userlistname2:
+          user: "jane insecure-password mypassword123"
+      cache:
+        cache1:
+          total-max-size: 4
+  tasks:
+    - name: Deploy HAProxy
+      ansible.builtin.import_role:
+        name: "{{ playbook_dir }}/../../../ansible-haproxy"
+
+    - name: Find created files
+      ansible.builtin.find:
+        path: "{{ haproxy_fragments_folder }}"
+      register: _files_in_fragments_folder
+
+    - name: Set fragments folder content
+      ansible.builtin.set_fact:
+        _haproxy_fragments_folder_content: "{{ _files_in_fragments_folder.files | map(attribute='path') | list | sort }}"
+
+    - name: Show fragments folder content
+      ansible.builtin.debug:
+        var: _haproxy_fragments_folder_content
+        verbosity: 1
+
+    - name: Check that the other fragments are present
+      ansible.builtin.assert:
+        that:
+          - "haproxy_fragments_folder ~ '006_userlist_userlistname.cfg' in _haproxy_fragments_folder_content"
+          - "haproxy_fragments_folder ~ '006_userlist_userlistname2.cfg' in _haproxy_fragments_folder_content"
+
+    - name: Check that fragments' content matches expectations
+      ansible.builtin.assert:
+        that:
+          - "lookup('file', haproxy_fragments_folder ~ '006_userlist_userlistname.cfg') | regex_search('userlist userlistname') is not none"
+          - "lookup('file', haproxy_fragments_folder ~ '006_userlist_userlistname.cfg') | regex_search('joe.*password') is not none"
+          - "lookup('file', haproxy_fragments_folder ~ '006_userlist_userlistname2.cfg') | regex_search('userlist userlistname2') is not none"
+          - "lookup('file', haproxy_fragments_folder ~ '006_userlist_userlistname2.cfg') | regex_search('jane.*password') is not none"
+          - "lookup('file', haproxy_fragments_folder ~ '006_cache_cache1.cfg') | regex_search('cache cache1') is not none"
+          - "lookup('file', haproxy_fragments_folder ~ '006_cache_cache1.cfg') | regex_search('total-max-size.*4') is not none"
