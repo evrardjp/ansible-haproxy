@@ -1,0 +1,4 @@
+# Test environment with latest ansible
+ansible
+ansible-lint
+yamllint
