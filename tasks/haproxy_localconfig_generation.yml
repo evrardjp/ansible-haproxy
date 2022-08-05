@@ -19,6 +19,11 @@
     state: directory
     recurse: true
 
+- name: Ensure role facts are clean
+  ansible.builtin.set_fact:
+    haproxy_fragments: []
+    haproxy_others_fragments: []
+
 ########
 # User #
 ########
