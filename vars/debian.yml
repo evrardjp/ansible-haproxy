@@ -22,7 +22,5 @@ _haproxy_extrapackages:
 
 haproxy_apt_cache: 600
 
-#TODO: Refactor
 haproxy_server_configuration_folder: "/etc/haproxy"
-haproxy_server_repo: "deb http://httpredir.debian.org/debian {{ ansible_distribution_release }}-backports main"
 haproxy_service_name: haproxy

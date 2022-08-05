@@ -34,13 +34,3 @@
     - _haproxyservicerestart is not defined
   tags:
     - haproxy-reload
-
-# TODO: Refactor, old content
-- name: Regenerate haproxy configuration
-  assemble:
-    src: "{{ haproxy_config_fragments_folder }}"
-    dest: "{{ haproxy_server_configuration_folder }}/haproxy.cfg"
-    delimiter: "{{ haproxy_fragment_delimiter | default(omit)}}"
-  notify: Restart haproxy
-  tags:
-    - haproxy-config
