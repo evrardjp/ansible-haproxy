@@ -882,3 +882,5 @@ haproxy_recommended_keywords:
     - bind
   listen:
     - bind
+  backend:
+    - server

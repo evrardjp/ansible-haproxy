@@ -20,6 +20,41 @@
           when:
             - ansible_failed_task.name != "Sanity check on user input before generating the backends"
 
+- name: Warn when input does not follow recommendations
+  hosts: localhost
+  connection: local
+  vars:
+    haproxy_fragments_folder: "{{ playbook_dir }}/fragments/"
+    haproxy_backends:
+      test1:
+        no log:
+    haproxy_user_fragments:
+      - content: |
+          listen minimum_fragment_to_pass_haproxy_handler
+            bind :4444
+            timeout connect         10s
+            timeout client          1m
+            timeout server          1m
+  tasks:
+    - name: Deploy, fail, and ignore do to lack of server in backend
+      block:
+        - name: Deploy HAProxy
+          ansible.builtin.import_role:
+            name: "{{ playbook_dir }}/../../../ansible-haproxy"
+      # We don't care if the rest of the execution succeeded or failed
+      # As long as we know the warning worked
+      rescue:
+        - name: Show recommendation state
+          ansible.builtin.debug:
+            var: backend_recommendation_state
+
+        - name: In case failure was NOT detected
+          ansible.builtin.fail:
+            msg: "Warning was _not_ generated while not following recommendations"
+          when:
+            - not backend_recommendation_state.failed | bool
+            - haproxy_check_config_with_role_recommendations | bool
+
 - name: Deploy with backends
   hosts: localhost
   connection: local

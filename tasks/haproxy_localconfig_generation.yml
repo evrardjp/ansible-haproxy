@@ -191,6 +191,17 @@
     - haproxy_backends.values() | list | combine | list | difference(haproxy_supported_keywords['backend'])
     - haproxy_check_config_with_role_recommendations | bool
 
+- name: Check that backends contain the recommended data
+  ansible.builtin.fail:
+    msg: "Backend will be incomplete, please make sure to fill the following keyword(s): {{ haproxy_recommended_keywords['backend'] | join(', ') }}"
+  register: backend_recommendation_state
+  # This will allow to show as an error but continue.
+  ignore_errors: true
+  when:
+    - haproxy_backends.keys() | length > 0
+    - haproxy_recommended_keywords['backend'] | difference(haproxy_backends.values() | list | combine | list) | length != 0
+    - haproxy_check_config_with_role_recommendations | bool
+
 - name: Generate the backend fragment files
   ansible.builtin.template:
     src: generic.cfg.j2
