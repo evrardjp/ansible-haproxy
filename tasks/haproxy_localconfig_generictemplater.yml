@@ -10,8 +10,6 @@
   register: _generated_files
   when:
     - haproxy_others[top_level_type].keys() | length > 0
-  notify:
-    - restart haproxy
 
 - name: Extend the list of other fragment files
   ansible.builtin.set_fact:

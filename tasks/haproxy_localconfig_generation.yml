@@ -58,8 +58,6 @@
     dest: "{{ haproxy_fragments_folder | dirname }}/001_global.cfg"
   when:
     - haproxy_globals_merged.keys() | length > 0
-  notify:
-    - restart haproxy
 
 ############
 # Defaults #
@@ -89,8 +87,6 @@
     defaults: "{{ haproxy_defaults_merged }}"
   when:
     - haproxy_defaults_merged.keys() | length > 0
-  notify:
-    - restart haproxy
 
 - name: Generate the named defaults fragment files
   ansible.builtin.template:
@@ -103,8 +99,6 @@
   loop: "{{ haproxy_named_defaults | dict2items() }}"
   when:
     - haproxy_named_defaults.keys() | length > 0
-  notify:
-    - restart haproxy
 
 ##########
 # Listen #
@@ -140,8 +134,6 @@
   loop: "{{ haproxy_listens | dict2items() }}"
   when:
     - haproxy_listens.keys() | length > 0
-  notify:
-    - restart haproxy
 
 ############
 # Frontend #
@@ -177,8 +169,6 @@
   loop: "{{ haproxy_frontends | dict2items() }}"
   when:
     - haproxy_frontends.keys() | length > 0
-  notify:
-    - restart haproxy
 
 ###########
 # Backend #
@@ -214,8 +204,6 @@
   loop: "{{ haproxy_backends | dict2items() }}"
   when:
     - haproxy_backends.keys() | length > 0
-  notify:
-    - restart haproxy
 
 ##########
 # Others #

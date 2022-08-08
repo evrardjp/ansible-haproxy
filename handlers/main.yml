@@ -19,6 +19,9 @@
     state: "restarted"
   register: _haproxyservicerestart
   when:
+    # If _haproxyservicestart was not defined, then an error happened.
+    # Do not try to restart if an error happened.
+    - _haproxyservicestart is defined
     - _haproxyservicestart is not changed
   tags:
     - haproxy-restart
