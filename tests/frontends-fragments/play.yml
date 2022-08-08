@@ -6,7 +6,7 @@
     haproxy_fragments_folder: "{{ playbook_dir }}/fragments/"
     haproxy_frontends:
       test1:
-        invalidkey: "invalid"
+        - invalidkey: "invalid"
   tasks:
     - name: Deploy and fail due to incorrect frontend
       block:
@@ -27,7 +27,7 @@
     haproxy_fragments_folder: "{{ playbook_dir }}/fragments/"
     haproxy_frontends:
       test1:
-        no log:
+        - no log:
   tasks:
     - name: Deploy, fail, and ignore do to lack of bind in frontend
       block:
@@ -53,7 +53,7 @@
     haproxy_fragments_folder: "{{ playbook_dir }}/fragments/"
     haproxy_frontends:
       test1:
-        bind: ":4444"
+        - bind: ":4444"
     haproxy_user_fragments:
       - content: |
           defaults

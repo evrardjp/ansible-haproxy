@@ -4,8 +4,8 @@
   connection: local
   vars:
     haproxy_fragments_folder: "{{ playbook_dir }}/fragments/"
-    haproxy_globals_merged: {}
-    haproxy_defaults_merged: {}
+    haproxy_globals_merged: []
+    haproxy_defaults_merged: []
     expected_filenames:
       - "{{ haproxy_fragments_folder | dirname }}/000_user_0.cfg"
       - "{{ haproxy_fragments_folder | dirname }}/000_user_1.cfg"

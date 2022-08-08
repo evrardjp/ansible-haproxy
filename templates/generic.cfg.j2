@@ -1,6 +1,7 @@
-{{ top_level_type }} {{ name }}
+{{ top_level_type }} {% if name is defined and name is not none %}{{ name }}{% endif %}
 
-{% for key, value in content.items() %}
-    {{ key }} {% if value is not none %}{{ value }}{% endif %}
+{% for item in content %}
+    {{ item.key }} {% if item.value is not none %}{{ item.value }}{% endif %}
 
 {% endfor %}
+

@@ -6,7 +6,7 @@
     haproxy_fragments_folder: "{{ playbook_dir }}/fragments/"
     haproxy_backends:
       test1:
-        invalidkey: "invalid"
+        - invalidkey: "invalid"
   tasks:
     - name: Deploy and fail due to incorrect backend
       block:
@@ -27,7 +27,7 @@
     haproxy_fragments_folder: "{{ playbook_dir }}/fragments/"
     haproxy_backends:
       test1:
-        no log:
+        - no log:
     haproxy_user_fragments:
       - content: |
           listen minimum_fragment_to_pass_haproxy_handler
@@ -62,7 +62,7 @@
     haproxy_fragments_folder: "{{ playbook_dir }}/fragments/"
     haproxy_backends:
       test1:
-        no log:
+        - no log:
     haproxy_user_fragments:
       - content: |
           listen minimum_fragment_to_pass_haproxy_handler

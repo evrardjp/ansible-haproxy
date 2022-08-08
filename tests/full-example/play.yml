@@ -1,0 +1,101 @@
+---
+- name: Deploy everything
+  hosts: localhost
+  connection: local
+  vars:
+    haproxy_fragments_folder: "{{ playbook_dir }}/fragments/"
+
+    haproxy_globals:
+        # UBUNTU
+        - log: /dev/log local0
+        - log: /dev/log local1 notice
+        # END UBUNTU
+        # RHEL
+        - log: 127.0.0.1 local2
+        # END RHEL
+        - chroot: /var/lib/haproxy
+        - pidfile: /var/run/haproxy.pid
+        - maxconn: 4000
+        - user: haproxy
+        - group: haproxy
+        - daemon:
+        # RHEL
+        #- stats: socket /var/lib/haproxy/stats
+        # END RHEL
+        # UBUNTU
+        - stats: timeout 30s
+        - stats: socket /run/haproxy/admin.sock mode 660 level admin expose-fd listeners
+        # END UBUNTU
+        # RHEL
+        #- ssl-default-bind-ciphers: PROFILE=SYSTEM
+        #- ssl-default-server-ciphers: PROFILE=SYSTEM
+        # END RHEL
+        # UBUNTU
+        - ca-base: /etc/ssl/certs
+        - crt-base: /etc/ssl/private
+        - ssl-default-bind-ciphers: ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384
+        - ssl-default-bind-ciphersuites: TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256
+        - ssl-default-bind-options: ssl-min-ver TLSv1.2 no-tls-tickets
+        # END UBUNTU
+
+    haproxy_named_defaults:
+      default_example1:
+        - timeout client: 5m
+        - timeout server: 5m
+        - timeout connect: 5s
+      default_example2:
+        - timeout client: 15m
+        - timeout server: 15m
+        - timeout connect: 15s
+    haproxy_defaults:
+      - mode: http
+      - log: global
+      - option httplog:
+      - option dontlognull:
+      - option http-server-close:
+      - option forwardfor: except 127.0.0.0/8
+      - option redispatch:
+      - retries: 3
+      - timeout http-request: 10s
+      - timeout queue: 1m
+      - timeout connect: 10s
+      - timeout client: 1m
+      - timeout server: 1m
+      - timeout http-keep-alive: 10s
+      - timeout check: 10s
+      - maxconn: 3000
+
+    haproxy_frontends:
+      main:
+        - bind: "*:5000"
+        - acl: url_static       path_beg       -i /static /images /javascript /stylesheets
+        - acl: url_static       path_end       -i .jpg .gif .png .css .js
+        - use_backend: static          if url_static
+        - default_backend: app
+    haproxy_backends:
+      static:
+        - balance: roundrobin
+        - server: static 127.0.0.1:4331 check
+      app:
+        - balance: roundrobin
+        - server: app1 127.0.0.1:5001 check
+        - server: app2 127.0.0.1:5002 check
+        - server: app3 127.0.0.1:5003 check
+        - server: app4 127.0.0.1:5004 check
+
+    haproxy_user_fragments:
+      - content: |+
+          # Example full file
+
+    haproxy_others:
+      userlist:
+        userlistname:
+          - user: "joe insecure-password mypassword123"
+          - user: "jane insecure-password mypassword123"
+      cache:
+        cache1:
+          - total-max-size: 4
+  tasks:
+    - name: Deploy HAProxy
+      ansible.builtin.import_role:
+        name: "{{ playbook_dir }}/../../../ansible-haproxy"

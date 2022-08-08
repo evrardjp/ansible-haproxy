@@ -6,7 +6,7 @@
     haproxy_fragments_folder: "{{ playbook_dir }}/fragments/"
     haproxy_listens:
       test1:
-        invalidkey: "invalid"
+        - invalidkey: "invalid"
   tasks:
     - name: Deploy and fail due to incorrect listen
       block:
@@ -27,7 +27,7 @@
     haproxy_fragments_folder: "{{ playbook_dir }}/fragments/"
     haproxy_listens:
       test1:
-        balance: "first"
+        - balance: "first"
   tasks:
     - name: Deploy, fail, and ignore due to lack of bind in listen
       block:
@@ -53,7 +53,7 @@
     haproxy_fragments_folder: "{{ playbook_dir }}/fragments/"
     haproxy_listens:
       test1:
-        bind: ":4444"
+        - bind: ":4444"
   tasks:
     - name: Deploy HAProxy
       ansible.builtin.import_role:

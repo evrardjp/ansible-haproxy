@@ -5,7 +5,7 @@
     mode: "0640"
   vars:
     name: "{{ item.key }}"
-    content: "{{ item.value }}"
+    content: "{{ item.value | list | map('dict2items') | flatten }}"
   loop: "{{ haproxy_others[top_level_type] | dict2items() }}"
   register: _generated_files
   when:

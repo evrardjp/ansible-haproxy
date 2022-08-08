@@ -14,7 +14,7 @@
     haproxy_others:
       cache:
         cache1:
-          max-age: 30
+          - max-age: 30
   tasks:
     - name: Run HAProxy role
       block:
@@ -46,12 +46,12 @@
     haproxy_others:
       userlist:
         userlistname:
-          user: "joe insecure-password mypassword123"
+          - user: "joe insecure-password mypassword123"
         userlistname2:
-          user: "jane insecure-password mypassword123"
+          - user: "jane insecure-password mypassword123"
       cache:
         cache1:
-          total-max-size: 4
+          - total-max-size: 4
   tasks:
     - name: Deploy HAProxy
       ansible.builtin.import_role:

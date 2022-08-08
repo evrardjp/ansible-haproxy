@@ -1,5 +1,7 @@
 # {{ ansible_managed }}
 global
-{% for key, value in haproxy_globals_merged.items() %}
-    {{ key }}	{{ value }}
+{% for item in globals %}
+    {{ item.key }} {% if item.value is defined and item.value != '' %}{{ item.value }}{% endif %}
+
 {% endfor %}
+

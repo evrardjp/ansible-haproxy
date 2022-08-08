@@ -5,7 +5,7 @@
   vars:
     haproxy_fragments_folder: "{{ playbook_dir }}/fragments/"
     haproxy_defaults:
-      invalidkey: "invalid"
+      - invalidkey: "invalid"
   tasks:
     - name: Deploy and fail due to incorrect global
       block:
@@ -25,9 +25,9 @@
   vars:
     haproxy_fragments_folder: "{{ playbook_dir }}/fragments/"
     haproxy_defaults:
-      timeout connect: 10s
-      timeout client: 1m
-      timeout server: 1m
+      - timeout connect: 10s
+      - timeout client: 1m
+      - timeout server: 1m
     # Making sure the final configuration passes haproxy validation
     haproxy_user_fragments:
       - content: |
@@ -68,14 +68,14 @@
   vars:
     haproxy_fragments_folder: "{{ playbook_dir }}/fragments/"
     haproxy_defaults:
-      timeout connect: 10s
-      timeout client: 1m
-      timeout server: 1m
+      - timeout connect: 10s
+      - timeout client: 1m
+      - timeout server: 1m
     haproxy_named_defaults:
       profile1:
-        timeout connect: 60s
+        - timeout connect: 60s
       profile2:
-        timeout connect: 1s
+        - timeout connect: 1s
     haproxy_user_fragments:
       - content: |
           listen awesome

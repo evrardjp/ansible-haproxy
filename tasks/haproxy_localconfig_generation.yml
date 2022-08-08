@@ -48,7 +48,9 @@
   ansible.builtin.fail:
     msg: "Fragment for global cannot be generated, incorrect keyword requested"
   when:
-    - haproxy_globals_merged.keys() | list | difference(haproxy_supported_keywords['global'])
+    # haproxy_globals_merged is a list of dicts with variable key name by design
+    # This makes sures each dict is in fact a list, whose single element is a dict with the always defined 'key' and 'value'.
+    - haproxy_globals_merged | map('dict2items') | flatten | map(attribute='key') | difference(haproxy_supported_keywords['global'])
     - haproxy_check_config_with_role_recommendations | bool
 
 - name: Generate the global file
@@ -56,8 +58,10 @@
     mode: "0640"
     src: global.cfg.j2
     dest: "{{ haproxy_fragments_folder | dirname }}/001_global.cfg"
+  vars:
+    globals: "{{ haproxy_globals_merged | map('dict2items') | flatten }}"
   when:
-    - haproxy_globals_merged.keys() | length > 0
+    - haproxy_globals_merged | length > 0
 
 ############
 # Defaults #
@@ -67,35 +71,37 @@
   ansible.builtin.fail:
     msg: "Anonymous defaults cannot be generated, incorrect keyword requested"
   when:
-    - haproxy_defaults_merged.keys() | list | difference(haproxy_supported_keywords['defaults'])
+    - haproxy_defaults_merged | map('dict2items') | flatten | map(attribute='key') | difference(haproxy_supported_keywords['defaults'])
     - haproxy_check_config_with_role_recommendations | bool
+
+- name: Generate the anonymous defaults fragment file
+  ansible.builtin.template:
+    src: generic.cfg.j2
+    dest: "{{ haproxy_fragments_folder | dirname }}/002_defaults.cfg"
+    mode: "0640"
+  vars:
+    top_level_type: "defaults"
+    name:
+    content: "{{ haproxy_defaults_merged | list | map('dict2items') | flatten }}"
+  when:
+    - haproxy_defaults_merged | length > 0
 
 - name: Sanity check on user input before generating the named defaults
   ansible.builtin.fail:
     msg: "Named defaults cannot be generated, incorrect keyword requested"
   when:
-    - haproxy_named_defaults.values() | list | combine | list | difference(haproxy_supported_keywords['defaults'])
+    - haproxy_named_defaults.values() | flatten | map('dict2items') | flatten | map(attribute='key') | unique | difference(haproxy_supported_keywords['defaults'])
     - haproxy_check_config_with_role_recommendations | bool
-
-- name: Generate the anonymous defaults fragment file
-  ansible.builtin.template:
-    src: defaults.cfg.j2
-    dest: "{{ haproxy_fragments_folder | dirname }}/002_defaults.cfg"
-    mode: "0640"
-  vars:
-    default_name:
-    defaults: "{{ haproxy_defaults_merged }}"
-  when:
-    - haproxy_defaults_merged.keys() | length > 0
 
 - name: Generate the named defaults fragment files
   ansible.builtin.template:
-    src: defaults.cfg.j2
-    dest: "{{ haproxy_fragments_folder | dirname }}/002_defaults_{{ default_name }}.cfg"
+    src: generic.cfg.j2
+    dest: "{{ haproxy_fragments_folder | dirname }}/002_{{ top_level_type }}_{{ name }}.cfg"
     mode: "0640"
   vars:
-    default_name: "{{ item.key }}"
-    defaults: "{{ item.value }}"
+    top_level_type: "defaults"
+    name: "{{ item.key }}"
+    content: "{{ item.value | list | map('dict2items') | flatten }}"
   loop: "{{ haproxy_named_defaults | dict2items() }}"
   when:
     - haproxy_named_defaults.keys() | length > 0
@@ -108,7 +114,7 @@
   ansible.builtin.fail:
     msg: "Listen cannot be generated, incorrect keyword requested"
   when:
-    - haproxy_listens.values() | list | combine | list | difference(haproxy_supported_keywords['listen'])
+    - haproxy_listens.values() | flatten | map('dict2items') | flatten | map(attribute='key') | unique | difference(haproxy_supported_keywords['listen'])
     - haproxy_check_config_with_role_recommendations | bool
 
 - name: Check that listens contain the recommended data
@@ -119,18 +125,18 @@
   ignore_errors: true
   when:
     - haproxy_listens.keys() | length > 0
-    - haproxy_recommended_keywords['listen'] | difference(haproxy_listens.values() | list | combine | list) | length != 0
+    - haproxy_recommended_keywords['listen'] | difference(haproxy_listens.values() | flatten | map('dict2items') | flatten | map(attribute='key') | unique) | length != 0
     - haproxy_check_config_with_role_recommendations | bool
 
 - name: Generate the listen fragment files
   ansible.builtin.template:
     src: generic.cfg.j2
-    dest: "{{ haproxy_fragments_folder | dirname }}/003_listen_{{ name }}.cfg"
+    dest: "{{ haproxy_fragments_folder | dirname }}/003_{{ top_level_type }}_{{ name }}.cfg"
     mode: "0640"
   vars:
     top_level_type: "listen"
     name: "{{ item.key }}"
-    content: "{{ item.value }}"
+    content: "{{ item.value | list | map('dict2items') | flatten }}"
   loop: "{{ haproxy_listens | dict2items() }}"
   when:
     - haproxy_listens.keys() | length > 0
@@ -143,7 +149,7 @@
   ansible.builtin.fail:
     msg: "Frontend cannot be generated, incorrect keyword requested"
   when:
-    - haproxy_frontends.values() | list | combine | list | difference(haproxy_supported_keywords['frontend'])
+    - haproxy_frontends.values() | flatten | map('dict2items') | flatten | map(attribute='key') | unique | difference(haproxy_supported_keywords['frontend'])
     - haproxy_check_config_with_role_recommendations | bool
 
 - name: Check that frontends contain the recommended data
@@ -154,18 +160,18 @@
   ignore_errors: true
   when:
     - haproxy_frontends.keys() | length > 0
-    - haproxy_recommended_keywords['frontend'] | difference(haproxy_frontends.values() | list | combine | list) | length != 0
+    - haproxy_recommended_keywords['frontend'] | difference(haproxy_frontends.values() | flatten | map('dict2items') | flatten | map(attribute='key') | unique) | length != 0
     - haproxy_check_config_with_role_recommendations | bool
 
 - name: Generate the frontend fragment files
   ansible.builtin.template:
     src: generic.cfg.j2
-    dest: "{{ haproxy_fragments_folder | dirname }}/004_frontend_{{ name }}.cfg"
+    dest: "{{ haproxy_fragments_folder | dirname }}/004_{{ top_level_type }}_{{ name }}.cfg"
     mode: "0640"
   vars:
     top_level_type: "frontend"
     name: "{{ item.key }}"
-    content: "{{ item.value }}"
+    content: "{{ item.value | list | map('dict2items') | flatten }}"
   loop: "{{ haproxy_frontends | dict2items() }}"
   when:
     - haproxy_frontends.keys() | length > 0
@@ -178,7 +184,7 @@
   ansible.builtin.fail:
     msg: "Backend cannot be generated, incorrect keyword requested"
   when:
-    - haproxy_backends.values() | list | combine | list | difference(haproxy_supported_keywords['backend'])
+    - haproxy_backends.values() | flatten | map('dict2items') | flatten | map(attribute='key') | unique | difference(haproxy_supported_keywords['backend'])
     - haproxy_check_config_with_role_recommendations | bool
 
 - name: Check that backends contain the recommended data
@@ -189,18 +195,18 @@
   ignore_errors: true
   when:
     - haproxy_backends.keys() | length > 0
-    - haproxy_recommended_keywords['backend'] | difference(haproxy_backends.values() | list | combine | list) | length != 0
+    - haproxy_recommended_keywords['backend'] | difference(haproxy_backends.values() | flatten | map('dict2items') | flatten | map(attribute='key') | unique) | length != 0
     - haproxy_check_config_with_role_recommendations | bool
 
 - name: Generate the backend fragment files
   ansible.builtin.template:
     src: generic.cfg.j2
-    dest: "{{ haproxy_fragments_folder | dirname }}/005_backend_{{ name }}.cfg"
+    dest: "{{ haproxy_fragments_folder | dirname }}/005_{{ top_level_type }}_{{ name }}.cfg"
     mode: "0640"
   vars:
     top_level_type: "backend"
     name: "{{ item.key }}"
-    content: "{{ item.value }}"
+    content: "{{ item.value | list | map('dict2items') | flatten }}"
   loop: "{{ haproxy_backends | dict2items() }}"
   when:
     - haproxy_backends.keys() | length > 0
@@ -230,10 +236,10 @@
     haproxy_fragments: |-
       {% set fragments = [] %}
       {% set _ = fragments.extend(_copied_user_fragments.results | map(attribute='dest') | list) %}
-      {% if haproxy_globals_merged.keys() | length > 0 %}
+      {% if haproxy_globals_merged | length > 0 %}
         {% set _ = fragments.append(haproxy_fragments_folder | dirname ~ '/001_global.cfg') %}
       {% endif %}
-      {% if haproxy_defaults_merged.keys() | length > 0 %}
+      {% if haproxy_defaults_merged | length > 0 %}
         {% set _ = fragments.append(haproxy_fragments_folder | dirname ~ '/002_defaults.cfg') %}
       {% endif %}
       {% for filename in haproxy_named_defaults.keys()  %}
