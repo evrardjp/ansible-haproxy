@@ -1,7 +1,6 @@
 ---
 - name: Test fail safe from incorrect user input on frontend
-  hosts: localhost
-  connection: local
+  hosts: haproxy[0]
   vars:
     haproxy_fragments_folder: "{{ playbook_dir }}/fragments/"
     haproxy_frontends:
@@ -21,8 +20,7 @@
             - ansible_failed_task.name != "Sanity check on user input before generating the frontends"
 
 - name: Warn when input does not follow recommendations
-  hosts: localhost
-  connection: local
+  hosts: haproxy[0]
   vars:
     haproxy_fragments_folder: "{{ playbook_dir }}/fragments/"
     haproxy_frontends:
@@ -47,8 +45,7 @@
             - haproxy_check_config_with_role_recommendations | bool
 
 - name: Deploy with frontends
-  hosts: localhost
-  connection: local
+  hosts: haproxy[0]
   vars:
     haproxy_fragments_folder: "{{ playbook_dir }}/fragments/"
     haproxy_frontends:
@@ -69,22 +66,27 @@
       ansible.builtin.find:
         path: "{{ haproxy_fragments_folder }}"
       register: _files_in_fragments_folder
+      delegate_to: localhost
 
     - name: Set fragments folder content
       ansible.builtin.set_fact:
         _haproxy_fragments_folder_content: "{{ _files_in_fragments_folder.files | map(attribute='path') | list | sort }}"
+      delegate_to: localhost
 
     - name: Show fragments folder content
       ansible.builtin.debug:
         var: _haproxy_fragments_folder_content
         verbosity: 1
+      delegate_to: localhost
 
     - name: Check that the frontend fragments are present
       ansible.builtin.assert:
         that:
           - "haproxy_fragments_folder ~ '004_frontend_test1.cfg' in _haproxy_fragments_folder_content"
+      delegate_to: localhost
 
     - name: Check that fragments' content matches expectations
       ansible.builtin.assert:
         that:
           - "lookup('file', haproxy_fragments_folder ~ '004_frontend_test1.cfg') | regex_search('bind.*4444') is not none"
+      delegate_to: localhost

@@ -1,7 +1,6 @@
 ---
 - name: Deploy everything
-  hosts: localhost
-  connection: local
+  hosts: haproxy
   vars:
     haproxy_fragments_folder: "{{ playbook_dir }}/fragments/"
 

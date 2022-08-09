@@ -1,7 +1,6 @@
 ---
 - name: Test user fragments are generated from src or content
-  hosts: localhost
-  connection: local
+  hosts: haproxy[0]
   vars:
     haproxy_fragments_folder: "{{ playbook_dir }}/fragments/"
     haproxy_globals_merged: {}
@@ -18,11 +17,6 @@
             timeout client          1m
             timeout server          1m
   tasks:
-    - name: Create a temp folder for fragments
-      ansible.builtin.file:
-        state: directory
-        path: "{{ haproxy_fragments_folder }}"
-
     - name: Deploy HAProxy
       ansible.builtin.import_role:
         name: "{{ playbook_dir }}/../../../ansible-haproxy"
@@ -31,13 +25,16 @@
       ansible.builtin.find:
         path: "{{ haproxy_fragments_folder }}"
       register: _files_in_fragments_folder
+      delegate_to: localhost
 
     - name: Check that only two files were created
       ansible.builtin.assert:
         that:
           - _files_in_fragments_folder.matched == (expected_filenames | length)
+      delegate_to: localhost
 
     - name: Check that all files match our expectations of filename
       ansible.builtin.assert:
         that:
           - (_files_in_fragments_folder.files | map(attribute='path') | list | sort) == expected_filenames
+      delegate_to: localhost

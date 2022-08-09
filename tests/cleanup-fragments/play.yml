@@ -1,7 +1,6 @@
 ---
 - name: Test if cleanup of cache works
-  hosts: localhost
-  connection: local
+  hosts: haproxy[0]
   vars:
     haproxy_fragments_folder: "{{ playbook_dir }}/fragments/"
     haproxy_globals_merged: []
@@ -22,11 +21,13 @@
       ansible.builtin.file:
         state: directory
         path: "{{ haproxy_fragments_folder }}"
+      delegate_to: localhost
 
     - name: Create an undesirable fragment in the fragment destination folder
       ansible.builtin.copy:
         content: "UNDESIRABLE FILE"
         dest: "{{ haproxy_fragments_folder | dirname }}/undesirable.cfg"
+      delegate_to: localhost
 
     - name: Deploy HAProxy
       ansible.builtin.import_role:
@@ -36,13 +37,16 @@
       ansible.builtin.find:
         path: "{{ haproxy_fragments_folder }}"
       register: _files_in_fragments_folder
+      delegate_to: localhost
 
     - name: Check that only two files were created
       ansible.builtin.assert:
         that:
           - _files_in_fragments_folder.matched == (expected_filenames | length)
+      delegate_to: localhost
 
     - name: Check that all files match our expectations of filename
       ansible.builtin.assert:
         that:
           - (_files_in_fragments_folder.files | map(attribute='path') | list | sort) == expected_filenames
+      delegate_to: localhost
